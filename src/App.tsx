@@ -4,6 +4,19 @@ import YouTubePlayer from "react-player/youtube"
 import "./App.css"
 import { AppMode, StorageKey } from "./constants"
 
+const keyframesPositive = {
+  easing: "ease-out",
+  boxShadow: ["0 0 4em 2em darkgreen", "none"],
+}
+const keyframesNegative = {
+  easing: "ease-out",
+  boxShadow: ["0 0 4em 2em crimson", "none"],
+}
+const animeOptions = {
+  duration: 800,
+  iterations: 1,
+}
+
 function App() {
   const [appMode, setAppMode] = useState(AppMode.Judging)
 
@@ -106,6 +119,11 @@ function App() {
     setVideoId(extractedId)
   }
 
+  /**
+   * handle click if judging is ongoing
+   * @param clickScore
+   * @returns void
+   */
   function parseClick(clickScore: number) {
     // do nothing if video is not ready
     if (
@@ -144,6 +162,9 @@ function App() {
           return newScoreMap
         }, new Map<number, number>())
     })
+
+    // flash screen
+    clickerFlash(clickScore)
   }
 
   /**
@@ -156,6 +177,31 @@ function App() {
       // @ts-ignore: firefox implemented this
       focusVisible: false,
     })
+  }
+
+  /**
+   * flash video on click
+   * @param clickScore
+   */
+  function clickerFlash(clickScore: number) {
+    const youtubePlayerElement =
+      window.document.getElementById("youtube-player")
+
+    switch (clickScore) {
+      case 1:
+        console.debug(`flash positive`)
+        youtubePlayerElement?.animate(keyframesPositive, animeOptions)
+        break
+
+      case -1:
+        console.debug(`flash negative`)
+        youtubePlayerElement?.animate(keyframesNegative, animeOptions)
+        break
+
+      default:
+        console.debug(`flash broke ${clickScore}`)
+        break
+    }
   }
 
   return (
@@ -213,6 +259,7 @@ function App() {
       <br></br>
 
       <YouTubePlayer
+        id="youtube-player"
         url={`https://www.youtube.com/watch?v=${videoId}`}
         controls={true}
         onDuration={setVideoDuration}
