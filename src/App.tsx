@@ -3,19 +3,9 @@ import YouTubePlayer from "react-player/youtube"
 
 import "./App.css"
 import { AppMode, StorageKey } from "./constants"
-
-const keyframesPositive = {
-  easing: "ease-out",
-  boxShadow: ["0 0 4em 2em darkgreen", "none"],
-}
-const keyframesNegative = {
-  easing: "ease-out",
-  boxShadow: ["0 0 4em 2em crimson", "none"],
-}
-const animeOptions = {
-  duration: 800,
-  iterations: 1,
-}
+import { generateClickListener, parseClick } from "./clickHandler"
+import { regainClickerFocus } from "./utils"
+import { parseLink } from "./videoHandler"
 
 function App() {
   const [appMode, setAppMode] = useState(AppMode.Judging)
@@ -37,47 +27,24 @@ function App() {
     return localData ? JSON.parse(localData) : "s"
   })
 
-  // TODO: don't steal focus from input boxes
-
   // add clicking key event listener
   useEffect(() => {
-    function onJudgeClick(event: KeyboardEvent) {
-      // do nothing if video is not ready
-      if (
-        appMode !== AppMode.Judging ||
-        !videoReady ||
-        videoDuration <= 0 ||
-        !youtubePlayer?.current
-      ) {
-        return
-      }
-
-      if (event.key === keyPositive || event.key === keyNegative) {
-        // disable default key actions
-        event.preventDefault()
-        event.stopPropagation()
-        event.stopImmediatePropagation()
-
-        // ignore keys held down
-        if (event.repeat) {
-          console.debug(`click repeat ${event.key}`)
-          return
-        }
-
-        // get score
-        const clickScore = event.key === keyPositive ? +1 : -1
-        console.debug(`click ${clickScore}`)
-
-        parseClick(clickScore)
-      }
-    }
+    const clickListener = generateClickListener(
+      appMode,
+      videoReady,
+      videoDuration,
+      youtubePlayer,
+      keyPositive,
+      keyNegative,
+      setScoreMap,
+    )
 
     // capture prioritizes this event listener
     // https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#capture
-    window.document.addEventListener("keydown", onJudgeClick, { capture: true })
+    window.addEventListener("keydown", clickListener, { capture: true })
 
     return () => {
-      window.removeEventListener("keydown", onJudgeClick)
+      window.removeEventListener("keydown", clickListener, { capture: true })
     }
   }, [
     appMode,
@@ -88,130 +55,28 @@ function App() {
     keyNegative,
   ])
 
-  /**
-   * validate and set input video url
-   * @param event
-   * @returns void
-   */
-  function parseLink(event: React.ChangeEvent<HTMLInputElement>) {
-    const inputLink = event.target.value
-
-    // update text box url
-    setVideoUrl(inputLink)
-
-    // validate youtube url
-    const regexID = "([0-9A-Za-z_-]*)"
-    const regexList = [
-      `youtube.com\/watch\?.*v=${regexID}`,
-      `youtube.com\/embed\/${regexID}`,
-      `youtube.com\/shorts\/${regexID}`,
-      `youtu.be\/${regexID}`,
-    ]
-    const regex = regexList.join("|")
-    const result = `${inputLink}`.match(regex)
-    if (!result) return // TODO: error
-
-    // extract the video id
-    const extractedId = result.slice(1).filter((e) => e)[0]
-    if (!extractedId) return // TODO: error
-
-    setVideoReady(false)
-    setVideoId(extractedId)
-  }
-
-  /**
-   * handle click if judging is ongoing
-   * @param clickScore
-   * @returns void
-   */
-  function parseClick(clickScore: number) {
-    // do nothing if video is not ready
-    if (
-      appMode !== AppMode.Judging ||
-      !videoReady ||
-      videoDuration <= 0 ||
-      !youtubePlayer?.current
-    ) {
-      return
-    }
-
-    // get time
-    const clickTime = youtubePlayer.current.getCurrentTime()
-    console.debug(`click ${clickScore}: ${clickTime} / ${videoDuration}`)
-
-    // note: it seems like the scoreMap value does not update within useEffect
-    // but the prevScoreMap value does update, so we're using that instead
-    setScoreMap((prevScoreMap) => {
-      const scoreMapCopy = new Map(prevScoreMap)
-
-      // delete score if it cancels out on the exact millisecond
-      // the user probably wants to delete the click if this happens
-      const newClickScore = clickScore + (scoreMapCopy.get(clickTime) ?? 0)
-      if (newClickScore === 0) {
-        scoreMapCopy.delete(clickTime)
-      } else {
-        scoreMapCopy.set(clickTime, newClickScore)
-      }
-
-      // sort by keys and return new copy of the map
-      return new Float64Array(scoreMapCopy.keys())
-        .sort()
-        .reduce((newScoreMap, time) => {
-          const clickScore = scoreMapCopy.get(time) ?? 0
-          newScoreMap.set(time, clickScore)
-          return newScoreMap
-        }, new Map<number, number>())
-    })
-
-    // flash screen
-    clickerFlash(clickScore)
-  }
-
-  /**
-   * cross origin iframe does not allow key logging!
-   * thus to use clicker shortcuts, we need to focus out of the iframe
-   */
-  function regainClickerFocus() {
-    window.document.getElementById("root")?.focus({
-      preventScroll: true,
-      // @ts-ignore: firefox implemented this
-      focusVisible: false,
-    })
-  }
-
-  /**
-   * flash video on click
-   * @param clickScore
-   */
-  function clickerFlash(clickScore: number) {
-    const youtubePlayerElement =
-      window.document.getElementById("youtube-player")
-
-    switch (clickScore) {
-      case 1:
-        console.debug(`flash positive`)
-        youtubePlayerElement?.animate(keyframesPositive, animeOptions)
-        break
-
-      case -1:
-        console.debug(`flash negative`)
-        youtubePlayerElement?.animate(keyframesNegative, animeOptions)
-        break
-
-      default:
-        console.debug(`flash broke ${clickScore}`)
-        break
-    }
-  }
-
   return (
     <>
+      <input
+        type="checkbox"
+        id="app-mode"
+        name="app-mode"
+        checked={appMode === AppMode.Judging}
+        onChange={(e) => {
+          e.target.checked
+            ? setAppMode(AppMode.Judging)
+            : setAppMode(AppMode.Playback)
+          regainClickerFocus()
+        }}
+      />
+
+      <br></br>
       <input
         type="text"
         id="video-id"
         name="video-id"
         value={videoUrl}
-        onChange={parseLink}
+        onChange={(e) => parseLink(e, setVideoUrl, setVideoReady, setVideoId)}
         required
       />
       <p>{videoId}</p>
@@ -221,7 +86,16 @@ function App() {
       <button
         id="click-positive"
         name="click-positive"
-        onClick={() => parseClick(+1)}
+        onClick={() =>
+          parseClick(
+            appMode,
+            videoReady,
+            videoDuration,
+            youtubePlayer,
+            setScoreMap,
+            +1,
+          )
+        }
       >
         +1
       </button>
@@ -240,7 +114,16 @@ function App() {
       <button
         id="click-negative"
         name="click-negative"
-        onClick={() => parseClick(-1)}
+        onClick={() =>
+          parseClick(
+            appMode,
+            videoReady,
+            videoDuration,
+            youtubePlayer,
+            setScoreMap,
+            -1,
+          )
+        }
       >
         -1
       </button>
