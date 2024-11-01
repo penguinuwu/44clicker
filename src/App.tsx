@@ -45,40 +45,17 @@ function App() {
         event.stopPropagation()
         event.stopImmediatePropagation()
 
-        // get click and score
-        const clickTime = youtubePlayer.current.getCurrentTime()
-        const clickScore = event.key === keyPositive ? +1 : -1
-        console.debug(`click ${clickScore} : ${clickTime} / ${videoDuration}`)
-
         // ignore keys held down
         if (event.repeat) {
-          console.debug(`click repeat`)
+          console.debug(`click repeat ${event.key}`)
           return
         }
 
-        // note: it seems like the scoreMap value does not update within useEffect
-        // but the prevScoreMap value does update, so we're using that instead
-        setScoreMap((prevScoreMap) => {
-          const scoreMapCopy = new Map(prevScoreMap)
+        // get score
+        const clickScore = event.key === keyPositive ? +1 : -1
+        console.debug(`click ${clickScore}`)
 
-          // delete score if it cancels out on the exact millisecond
-          // the user probably wants to delete the click if this happens
-          const newClickScore = clickScore + (scoreMapCopy.get(clickTime) ?? 0)
-          if (newClickScore === 0) {
-            scoreMapCopy.delete(clickTime)
-          } else {
-            scoreMapCopy.set(clickTime, newClickScore)
-          }
-
-          // sort by keys and return new copy of the map
-          return new Float64Array(scoreMapCopy.keys())
-            .sort()
-            .reduce((newScoreMap, time) => {
-              const clickScore = scoreMapCopy.get(time) ?? 0
-              newScoreMap.set(time, clickScore)
-              return newScoreMap
-            }, new Map<number, number>())
-        })
+        parseClick(clickScore)
       }
     }
 
@@ -129,6 +106,46 @@ function App() {
     setVideoId(extractedId)
   }
 
+  function parseClick(clickScore: number) {
+    // do nothing if video is not ready
+    if (
+      appMode !== AppMode.Judging ||
+      !videoReady ||
+      videoDuration <= 0 ||
+      !youtubePlayer?.current
+    ) {
+      return
+    }
+
+    // get time
+    const clickTime = youtubePlayer.current.getCurrentTime()
+    console.debug(`click ${clickScore}: ${clickTime} / ${videoDuration}`)
+
+    // note: it seems like the scoreMap value does not update within useEffect
+    // but the prevScoreMap value does update, so we're using that instead
+    setScoreMap((prevScoreMap) => {
+      const scoreMapCopy = new Map(prevScoreMap)
+
+      // delete score if it cancels out on the exact millisecond
+      // the user probably wants to delete the click if this happens
+      const newClickScore = clickScore + (scoreMapCopy.get(clickTime) ?? 0)
+      if (newClickScore === 0) {
+        scoreMapCopy.delete(clickTime)
+      } else {
+        scoreMapCopy.set(clickTime, newClickScore)
+      }
+
+      // sort by keys and return new copy of the map
+      return new Float64Array(scoreMapCopy.keys())
+        .sort()
+        .reduce((newScoreMap, time) => {
+          const clickScore = scoreMapCopy.get(time) ?? 0
+          newScoreMap.set(time, clickScore)
+          return newScoreMap
+        }, new Map<number, number>())
+    })
+  }
+
   /**
    * cross origin iframe does not allow key logging!
    * thus to use clicker shortcuts, we need to focus out of the iframe
@@ -155,6 +172,13 @@ function App() {
 
       <br></br>
 
+      <button
+        id="click-positive"
+        name="click-positive"
+        onClick={() => parseClick(+1)}
+      >
+        +1
+      </button>
       <input
         type="text"
         id="key-positive"
@@ -165,6 +189,15 @@ function App() {
         maxLength={1}
         required
       />
+
+      <br></br>
+      <button
+        id="click-negative"
+        name="click-negative"
+        onClick={() => parseClick(-1)}
+      >
+        -1
+      </button>
       <input
         type="text"
         id="key-negative"
