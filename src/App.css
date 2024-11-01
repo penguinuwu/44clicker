@@ -5,6 +5,11 @@
   text-align: center;
 }
 
+/* hide outline when root is auto-focused for clicking */
+#root:focus-visible {
+  outline: none;
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;

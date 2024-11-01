@@ -7,7 +7,9 @@
     <title>44 Clicker</title>
   </head>
   <body>
-    <div id="root"></div>
+    <!-- tabindex set to 0 allowing chromium to focus -->
+    <!-- https://issues.chromium.org/issues/41162655 -->
+    <div id="root" tabindex="0"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
