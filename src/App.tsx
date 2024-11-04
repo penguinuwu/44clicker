@@ -3,12 +3,16 @@ import YouTubePlayer from "react-player/youtube"
 
 import "./App.css"
 import { AppMode, StorageKey } from "./constants"
-import { generateClickListener, parseClick } from "./clickHandler"
-import { regainClickerFocus } from "./utils"
-import { parseLink } from "./videoHandler"
+import {
+  addClick,
+  generateClickListener,
+  resetScoreMap,
+} from "./scoringHandler"
+import { downloadScores, changeVideo, uploadScores } from "./userInputHandler"
+import { regainClickerFocus, youtubeVideoIdToUrl } from "./utils"
 
 function App() {
-  const [appMode, setAppMode] = useState(AppMode.Judging)
+  const [appMode, setAppMode] = useState(AppMode.Scoring)
 
   const youtubePlayer = useRef<YouTubePlayer | null>(null)
   const [videoUrl, setVideoUrl] = useState("https://youtu.be/9hhMUT2U2L4")
@@ -17,6 +21,9 @@ function App() {
   const [videoDuration, setVideoDuration] = useState(0)
 
   const [scoreMap, setScoreMap] = useState(new Map<number, number>())
+
+  const filesDownloadElement = useRef<HTMLAnchorElement | null>(null)
+  const fileUploadElement = useRef<HTMLInputElement | null>(null)
 
   const [keyPositive, setKeyPositive] = useState(() => {
     const localData = localStorage.getItem(StorageKey.KeyPositive)
@@ -58,13 +65,13 @@ function App() {
   return (
     <>
       <input
-        type="checkbox"
         id="app-mode"
         name="app-mode"
-        checked={appMode === AppMode.Judging}
+        type="checkbox"
+        checked={appMode === AppMode.Scoring}
         onChange={(e) => {
           e.target.checked
-            ? setAppMode(AppMode.Judging)
+            ? setAppMode(AppMode.Scoring)
             : setAppMode(AppMode.Playback)
           regainClickerFocus()
         }}
@@ -72,11 +79,19 @@ function App() {
 
       <br></br>
       <input
-        type="text"
         id="video-id"
         name="video-id"
+        type="text"
         value={videoUrl}
-        onChange={(e) => parseLink(e, setVideoUrl, setVideoReady, setVideoId)}
+        onChange={(e) =>
+          changeVideo(
+            e.target.value,
+            setScoreMap,
+            setVideoUrl,
+            setVideoReady,
+            setVideoId,
+          )
+        }
         required
       />
       <p>{videoId}</p>
@@ -87,7 +102,7 @@ function App() {
         id="click-positive"
         name="click-positive"
         onClick={() =>
-          parseClick(
+          addClick(
             appMode,
             videoReady,
             videoDuration,
@@ -100,9 +115,9 @@ function App() {
         +1
       </button>
       <input
-        type="text"
         id="key-positive"
         name="key-positive"
+        type="text"
         value={keyPositive}
         onChange={(e) => setKeyPositive(e.target.value)}
         minLength={1}
@@ -115,7 +130,7 @@ function App() {
         id="click-negative"
         name="click-negative"
         onClick={() =>
-          parseClick(
+          addClick(
             appMode,
             videoReady,
             videoDuration,
@@ -128,9 +143,9 @@ function App() {
         -1
       </button>
       <input
-        type="text"
         id="key-negative"
         name="key-negative"
+        type="text"
         value={keyNegative}
         onChange={(e) => setKeyNegative(e.target.value)}
         minLength={1}
@@ -143,10 +158,10 @@ function App() {
 
       <YouTubePlayer
         id="youtube-player"
-        url={`https://www.youtube.com/watch?v=${videoId}`}
+        url={youtubeVideoIdToUrl(videoId)}
         controls={true}
         onDuration={setVideoDuration}
-        onError={console.debug} // TODO
+        onError={window.alert}
         onReady={() => setVideoReady(true)}
         onStart={regainClickerFocus}
         onPlay={regainClickerFocus}
@@ -161,6 +176,59 @@ function App() {
         onEnablePIP={regainClickerFocus}
         onDisablePIP={regainClickerFocus}
         ref={youtubePlayer}
+      />
+
+      <br></br>
+
+      <button
+        id="reset-scores"
+        name="reset-scores"
+        onClick={() => resetScoreMap(setScoreMap, false)}
+        disabled={scoreMap.size <= 0}
+      >
+        Reset Scores
+      </button>
+      <button
+        id="download-scores"
+        name="download-scores"
+        onClick={() => downloadScores(filesDownloadElement, scoreMap, videoId)}
+        disabled={appMode !== AppMode.Scoring || scoreMap.size <= 0}
+      >
+        Download Scores
+      </button>
+      <button
+        id="import-scores"
+        name="import-scores"
+        onClick={() => fileUploadElement.current?.click()}
+      >
+        Import Scores
+      </button>
+
+      <br></br>
+
+      {/* elements to trigger file download */}
+      <a
+        ref={filesDownloadElement}
+        href=""
+        style={{ display: "none", visibility: "hidden" }}
+        hidden
+      ></a>
+      {/* elements to trigger file upload */}
+      <input
+        ref={fileUploadElement}
+        onChange={() =>
+          uploadScores(
+            fileUploadElement,
+            setScoreMap,
+            setVideoUrl,
+            setVideoReady,
+            setVideoId,
+          )
+        }
+        type="file"
+        accept=".json,application/json"
+        style={{ display: "none", visibility: "hidden" }}
+        hidden
       />
 
       <br></br>

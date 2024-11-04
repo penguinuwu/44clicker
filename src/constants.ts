@@ -5,6 +5,19 @@ export enum StorageKey {
 }
 
 export enum AppMode {
-  Judging = "SCORING",
+  Scoring = "SCORING",
   Playback = "PLAYBACK",
+}
+
+export const keyframesPositive = {
+  easing: "ease-out",
+  boxShadow: ["0 0 4em 2em darkgreen", "none"],
+}
+export const keyframesNegative = {
+  easing: "ease-out",
+  boxShadow: ["0 0 4em 2em crimson", "none"],
+}
+export const animeOptions = {
+  duration: 800,
+  iterations: 1,
 }

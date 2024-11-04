@@ -1,26 +1,19 @@
 import YouTubePlayer from "react-player/youtube"
 
-import { AppMode } from "./constants"
+import {
+  animeOptions,
+  AppMode,
+  keyframesNegative,
+  keyframesPositive,
+} from "./constants"
+import { ScoreJson } from "./types"
 import { sortMapByKey } from "./utils"
-
-const keyframesPositive = {
-  easing: "ease-out",
-  boxShadow: ["0 0 4em 2em darkgreen", "none"],
-}
-const keyframesNegative = {
-  easing: "ease-out",
-  boxShadow: ["0 0 4em 2em crimson", "none"],
-}
-const animeOptions = {
-  duration: 800,
-  iterations: 1,
-}
 
 /**
  * flash video on click
  * @param clickScore
  */
-function clickerFlash(clickScore: number) {
+export function clickerFlash(clickScore: number) {
   // TODO: replace with ref to prevent querying every flash
   const youtubePlayerElement = window.document.getElementById("youtube-player")
 
@@ -40,7 +33,7 @@ function clickerFlash(clickScore: number) {
 }
 
 /**
- * a
+ * return keydown listener function for clicks
  * @param appMode
  * @param videoReady
  * @param videoDuration
@@ -48,7 +41,7 @@ function clickerFlash(clickScore: number) {
  * @param keyPositive
  * @param keyNegative
  * @param setScoreMap
- * @returns void
+ * @returns (event: KeyboardEvent) => void
  */
 export function generateClickListener(
   appMode: AppMode,
@@ -62,7 +55,7 @@ export function generateClickListener(
   return function (event: KeyboardEvent) {
     // do nothing if video is not ready
     if (
-      appMode !== AppMode.Judging ||
+      appMode !== AppMode.Scoring ||
       !videoReady ||
       videoDuration <= 0 ||
       !youtubePlayer?.current
@@ -95,7 +88,7 @@ export function generateClickListener(
       // get score
       const clickScore = event.key === keyPositive ? +1 : -1
 
-      parseClick(
+      addClick(
         appMode,
         videoReady,
         videoDuration,
@@ -108,11 +101,11 @@ export function generateClickListener(
 }
 
 /**
- * handle click if judging is ongoing
+ * add click if judging is ongoing
  * @param clickScore
  * @returns void
  */
-export function parseClick(
+export function addClick(
   appMode: AppMode,
   videoReady: boolean,
   videoDuration: number,
@@ -122,7 +115,7 @@ export function parseClick(
 ) {
   // do nothing if video is not ready
   if (
-    appMode !== AppMode.Judging ||
+    appMode !== AppMode.Scoring ||
     !videoReady ||
     videoDuration <= 0 ||
     !youtubePlayer?.current
@@ -154,4 +147,68 @@ export function parseClick(
 
   // flash screen
   clickerFlash(clickScore)
+}
+
+/**
+ * delete click from score mapping at given time
+ * @param appMode
+ * @param setScoreMap
+ * @param clickTime
+ * @returns void
+ */
+export function deleteClick(
+  appMode: AppMode,
+  setScoreMap: React.Dispatch<React.SetStateAction<Map<number, number>>>,
+  clickTime: number,
+) {
+  // do nothing if not in judging mode
+  if (appMode !== AppMode.Scoring) {
+    return
+  }
+
+  console.debug(`deleting click ${clickTime}`)
+
+  // note: it seems like the scoreMap value does not update within useEffect
+  // but the prevScoreMap value does update, so we're using that instead
+  setScoreMap((prevScoreMap) => {
+    const scoreMapCopy = new Map(prevScoreMap)
+
+    // delete score
+    scoreMapCopy.delete(clickTime)
+
+    // sort by keys and return new copy of the map
+    return sortMapByKey(scoreMapCopy)
+  })
+}
+
+/**
+ * set scores from json, assuming input is sanitized
+ * @param setScoreMap
+ * @param scoreJson
+ * @param confirmed skip confirmation popup
+ */
+export function importScoreMap(
+  setScoreMap: React.Dispatch<React.SetStateAction<Map<number, number>>>,
+  scoreJson: ScoreJson,
+  confirmed: boolean,
+) {
+  // assume everything has been sanitized
+  if (confirmed || window.confirm("Are you sure you want to import scores?")) {
+    // create new map, then sort, then set
+    setScoreMap(sortMapByKey(new Map(scoreJson.scores)))
+  }
+}
+
+/**
+ * delete all mappings of timestamp to click
+ * @param setScoreMap
+ * @param confirmed skip confirmation popup
+ */
+export function resetScoreMap(
+  setScoreMap: React.Dispatch<React.SetStateAction<Map<number, number>>>,
+  confirmed: boolean,
+) {
+  if (confirmed || window.confirm("Are you sure you want to reset scores?")) {
+    setScoreMap(new Map<number, number>())
+  }
 }

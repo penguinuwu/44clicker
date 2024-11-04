@@ -24,3 +24,12 @@ export function sortMapByKey(inputMap: Map<any, any>) {
       return newScoreMap
     }, new Map<number, number>())
 }
+
+/**
+ * convert youtube video ID to its full URL
+ * @param videoId
+ * @returns
+ */
+export function youtubeVideoIdToUrl(videoId: string) {
+  return `https://www.youtube.com/watch?v=${videoId}`
+}
