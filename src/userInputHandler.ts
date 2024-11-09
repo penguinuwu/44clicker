@@ -5,6 +5,7 @@ import { youtubeVideoIdToUrl } from "./utils"
 /**
  * validate input video url, show confirm popup, set video url
  * @param inputLink
+ * @param currentVideoId
  * @param setScoreMap
  * @param setVideoUrl
  * @param setVideoReady
@@ -13,6 +14,7 @@ import { youtubeVideoIdToUrl } from "./utils"
  */
 export function changeVideo(
   inputLink: string,
+  currentVideoId: string,
   setScoreMap: React.Dispatch<React.SetStateAction<Map<number, number>>>,
   setVideoUrl: React.Dispatch<React.SetStateAction<string>>,
   setVideoReady: React.Dispatch<React.SetStateAction<boolean>>,
@@ -55,8 +57,13 @@ export function changeVideo(
   }
 
   resetScoreMap(setScoreMap, true)
-  setVideoReady(false)
-  setVideoId(extractedId)
+
+  // no need to unready video if it's the same video
+  if (extractedId !== currentVideoId) {
+    setVideoReady(false)
+    setVideoId(extractedId)
+  }
+
   return true
 }
 
@@ -106,8 +113,19 @@ export function downloadScores(
   filesDownloadElement.current.click()
 }
 
-export async function uploadScores(
+/**
+ * import scores
+ * @param fileUploadElement
+ * @param currentVideoId
+ * @param setScoreMap
+ * @param setVideoUrl
+ * @param setVideoReady
+ * @param setVideoId
+ * @returns void
+ */
+export async function importScores(
   fileUploadElement: React.MutableRefObject<HTMLInputElement | null>,
+  currentVideoId: string,
   setScoreMap: React.Dispatch<React.SetStateAction<Map<number, number>>>,
   setVideoUrl: React.Dispatch<React.SetStateAction<string>>,
   setVideoReady: React.Dispatch<React.SetStateAction<boolean>>,
@@ -146,7 +164,9 @@ export async function uploadScores(
         !Array.isArray(pair) ||
         pair.length !== 2 ||
         typeof pair[0] !== "number" ||
-        typeof pair[1] !== "number"
+        typeof pair[1] !== "number" ||
+        !Number.isFinite(pair[0]) ||
+        !Number.isFinite(pair[1])
       ) {
         console.debug(pair)
         window.alert("Error: incorrect scores format")
@@ -161,6 +181,7 @@ export async function uploadScores(
     if (
       !changeVideo(
         youtubeVideoIdToUrl(scoreJson.videoId),
+        currentVideoId,
         setScoreMap,
         setVideoUrl,
         setVideoReady,

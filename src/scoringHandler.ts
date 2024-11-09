@@ -1,10 +1,10 @@
 import YouTubePlayer from "react-player/youtube"
 
 import {
-  animeOptions,
+  ANIME_OPTIONS,
   AppMode,
-  keyframesNegative,
-  keyframesPositive,
+  KEYFRAMES_NEGATIVE,
+  KEYFRAMES_POSITIVE,
 } from "./constants"
 import { ScoreJson } from "./types"
 import { sortMapByKey } from "./utils"
@@ -19,11 +19,11 @@ export function clickerFlash(clickScore: number) {
 
   switch (clickScore) {
     case 1:
-      youtubePlayerElement?.animate(keyframesPositive, animeOptions)
+      youtubePlayerElement?.animate(KEYFRAMES_POSITIVE, ANIME_OPTIONS)
       break
 
     case -1:
-      youtubePlayerElement?.animate(keyframesNegative, animeOptions)
+      youtubePlayerElement?.animate(KEYFRAMES_NEGATIVE, ANIME_OPTIONS)
       break
 
     default:

@@ -2,13 +2,14 @@ import { useEffect, useRef, useState } from "react"
 import YouTubePlayer from "react-player/youtube"
 
 import "./App.css"
-import { AppMode, StorageKey } from "./constants"
+import { AppMode, INTERVAL_DELAY, StorageKey } from "./constants"
+import { generateReplayFunction } from "./replayHandler"
 import {
   addClick,
   generateClickListener,
   resetScoreMap,
 } from "./scoringHandler"
-import { downloadScores, changeVideo, uploadScores } from "./userInputHandler"
+import { changeVideo, downloadScores, importScores } from "./userInputHandler"
 import { regainClickerFocus, youtubeVideoIdToUrl } from "./utils"
 
 function App() {
@@ -36,6 +37,10 @@ function App() {
 
   // add clicking key event listener
   useEffect(() => {
+    if (appMode !== AppMode.Scoring) {
+      return
+    }
+
     const clickListener = generateClickListener(
       appMode,
       videoReady,
@@ -51,7 +56,53 @@ function App() {
     window.addEventListener("keydown", clickListener, { capture: true })
 
     return () => {
+      console.debug(`useEffect cleanup: remove scoring listener`)
       window.removeEventListener("keydown", clickListener, { capture: true })
+    }
+  }, [
+    appMode,
+    videoReady,
+    videoDuration,
+    youtubePlayer,
+    keyPositive,
+    keyNegative,
+  ])
+
+  useEffect(() => {
+    if (appMode !== AppMode.Playback) {
+      return
+    }
+
+    // do nothing if video is not ready
+    if (
+      !videoReady ||
+      videoDuration <= 0 ||
+      !youtubePlayer?.current ||
+      scoreMap.size <= 0
+    ) {
+      return
+    }
+
+    // set video to 5 seconds before first click if possible
+    const firstClickTime = Math.min(...scoreMap.keys())
+    youtubePlayer.current.seekTo(Math.max(firstClickTime - 5, 0))
+
+    // start interval
+    const intervalId = window.setInterval(
+      generateReplayFunction(youtubePlayer.current, Array.from(scoreMap)),
+      INTERVAL_DELAY,
+    )
+
+    // start video
+    youtubePlayer.current.getInternalPlayer().playVideo()
+
+    // clear interval on re-render
+    return () => {
+      console.debug(`useEffect cleanup: clear replay interval`)
+      window.clearInterval(intervalId)
+      if (youtubePlayer.current) {
+        youtubePlayer.current.getInternalPlayer().pauseVideo()
+      }
     }
   }, [
     appMode,
@@ -64,20 +115,21 @@ function App() {
 
   return (
     <>
-      <input
+      <button
         id="app-mode"
         name="app-mode"
-        type="checkbox"
-        checked={appMode === AppMode.Scoring}
-        onChange={(e) => {
-          e.target.checked
+        onClick={() =>
+          appMode === AppMode.Playback
             ? setAppMode(AppMode.Scoring)
             : setAppMode(AppMode.Playback)
-          regainClickerFocus()
-        }}
-      />
+        }
+        disabled={!(appMode === AppMode.Playback || scoreMap.size > 0)}
+      >
+        {appMode === AppMode.Scoring ? "Play Back Scores" : "Stop Play Back"}
+      </button>
 
       <br></br>
+
       <input
         id="video-id"
         name="video-id"
@@ -86,6 +138,7 @@ function App() {
         onChange={(e) =>
           changeVideo(
             e.target.value,
+            videoId,
             setScoreMap,
             setVideoUrl,
             setVideoReady,
@@ -94,7 +147,7 @@ function App() {
         }
         required
       />
-      <p>{videoId}</p>
+      <p>Currently playing video ID: {videoId}</p>
 
       <br></br>
 
@@ -163,18 +216,18 @@ function App() {
         onDuration={setVideoDuration}
         onError={window.alert}
         onReady={() => setVideoReady(true)}
-        onStart={regainClickerFocus}
-        onPlay={regainClickerFocus}
-        onPause={regainClickerFocus}
-        onBuffer={regainClickerFocus}
-        onBufferEnd={regainClickerFocus}
-        onSeek={regainClickerFocus}
-        onPlaybackRateChange={regainClickerFocus}
-        onPlaybackQualityChange={regainClickerFocus}
-        onEnded={regainClickerFocus}
-        onClickPreview={regainClickerFocus}
-        onEnablePIP={regainClickerFocus}
-        onDisablePIP={regainClickerFocus}
+        onStart={() => regainClickerFocus(appMode)}
+        onPlay={() => regainClickerFocus(appMode)}
+        onPause={() => regainClickerFocus(appMode)}
+        onBuffer={() => regainClickerFocus(appMode)}
+        onBufferEnd={() => regainClickerFocus(appMode)}
+        onSeek={() => regainClickerFocus(appMode)}
+        onPlaybackRateChange={() => regainClickerFocus(appMode)}
+        onPlaybackQualityChange={() => regainClickerFocus(appMode)}
+        onEnded={() => regainClickerFocus(appMode)}
+        onClickPreview={() => regainClickerFocus(appMode)}
+        onEnablePIP={() => regainClickerFocus(appMode)}
+        onDisablePIP={() => regainClickerFocus(appMode)}
         ref={youtubePlayer}
       />
 
@@ -184,7 +237,7 @@ function App() {
         id="reset-scores"
         name="reset-scores"
         onClick={() => resetScoreMap(setScoreMap, false)}
-        disabled={scoreMap.size <= 0}
+        disabled={appMode !== AppMode.Scoring || scoreMap.size <= 0}
       >
         Reset Scores
       </button>
@@ -192,7 +245,7 @@ function App() {
         id="download-scores"
         name="download-scores"
         onClick={() => downloadScores(filesDownloadElement, scoreMap, videoId)}
-        disabled={appMode !== AppMode.Scoring || scoreMap.size <= 0}
+        disabled={scoreMap.size <= 0}
       >
         Download Scores
       </button>
@@ -217,8 +270,9 @@ function App() {
       <input
         ref={fileUploadElement}
         onChange={() =>
-          uploadScores(
+          importScores(
             fileUploadElement,
+            videoId,
             setScoreMap,
             setVideoUrl,
             setVideoReady,
