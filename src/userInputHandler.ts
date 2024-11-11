@@ -1,4 +1,4 @@
-import { id, InstantReactWeb, lookup, tx } from "@instantdb/react"
+import { id, InstantReactWeb, tx } from "@instantdb/react"
 
 import { importScoreMap, resetScoreMap } from "./scoringHandler"
 import { ScoreJson } from "./types"
@@ -256,32 +256,25 @@ export async function publishScores(
     scoreMap,
   )
 
+  const url =
+    `${window.location.origin}/?` + `id=${encodeURIComponent(scoreJson.hash)}`
+
   // publish scores
-  db.transact(tx.scores[lookup("hash", scoreJson.hash)].update(scoreJson))
-    .then(() =>
-      window.alert(
-        `Score published:\n` +
-          `${window.location.origin}/?` +
-          `id=${encodeURIComponent(scoreJson.hash)}`,
-      ),
-    )
+  db.transact(tx.scores[id()].update(scoreJson))
+    .then(() => window.alert(`Score published! Find the score at:\n${url}`))
     .catch((e) => {
-      // TODO: lookup not creating new id, is this a bug !?
-      if (e?.message === "Validation failed for lookup") {
-        db.transact(tx.scores[id()].update(scoreJson))
-          .then(() =>
-            window.alert(
-              `Score published:\n` +
-                `${window.location.origin}/?` +
-                `id=${encodeURIComponent(scoreJson.hash)}`,
-            ),
-          )
-          .catch((e) => {
-            console.debug(e)
-            window.alert("Error: score publish failed :[")
-          })
+      console.debug(e)
+      if (
+        e.message &&
+        `${e.message}`.toLowerCase().startsWith("record not unique")
+      ) {
+        window.alert(
+          `Error: score has already been published!\n` +
+            `\n` +
+            `Find the score at:\n` +
+            `${url}`,
+        )
       } else {
-        console.debug(e)
         window.alert("Error: score publish failed :[")
       }
     })
