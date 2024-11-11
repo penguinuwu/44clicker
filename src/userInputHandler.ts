@@ -1,6 +1,8 @@
+import { id, InstantReactWeb, lookup, tx } from "@instantdb/react"
+
 import { importScoreMap, resetScoreMap } from "./scoringHandler"
 import { ScoreJson } from "./types"
-import { youtubeVideoIdToUrl } from "./utils"
+import { getScoreJson, youtubeVideoIdToUrl } from "./utils"
 
 /**
  * validate input video url, show confirm popup, set video url
@@ -70,14 +72,14 @@ export function changeVideo(
 /**
  * download scores
  * @param filesDownloadElement
- * @param scoreMap
  * @param videoId
+ * @param scoreMap
  * @returns void
  */
-export function downloadScores(
+export async function downloadScores(
   filesDownloadElement: React.MutableRefObject<HTMLAnchorElement | null>,
-  scoreMap: Map<number, number>,
   videoId: string,
+  scoreMap: Map<number, number>,
 ) {
   console.debug(`download scores ${videoId}`)
 
@@ -86,31 +88,95 @@ export function downloadScores(
     return
   }
 
-  // get download date time
-  const downloadDateNow = Date.now()
-
-  // set download default file name
-  filesDownloadElement.current.setAttribute(
-    "download",
-    `44clicker-scores_${videoId}_${downloadDateNow}.json`,
+  // generate score json
+  const scoreJson = await getScoreJson(
+    videoId,
+    "", // TODO: judge name
+    scoreMap,
   )
 
-  // generate stringified json
-  const scoreJson: ScoreJson = {
-    videoId: videoId,
-    judgeName: "", // TODO
-    date: downloadDateNow,
-    scores: Array.from(scoreMap.entries()),
-  }
-  const scoreJsonString = JSON.stringify(scoreJson)
+  // set download file name and file content
+  filesDownloadElement.current.setAttribute(
+    "download",
+    `44clicker-scores_${scoreJson.videoId}.json`,
+  )
   filesDownloadElement.current.setAttribute(
     "href",
     `data:application/json;charset=utf-8,` +
-      encodeURIComponent(scoreJsonString),
+      encodeURIComponent(JSON.stringify(scoreJson)),
   )
 
   // download file
   filesDownloadElement.current.click()
+}
+
+/**
+ * import scores
+ * @param currentVideoId
+ * @param setScoreMap
+ * @param setVideoUrl
+ * @param setVideoReady
+ * @param setVideoId
+ * @param scoreJson
+ * @returns
+ */
+export async function importScoreJson(
+  currentVideoId: string,
+  setScoreMap: React.Dispatch<React.SetStateAction<Map<number, number>>>,
+  setVideoUrl: React.Dispatch<React.SetStateAction<string>>,
+  setVideoReady: React.Dispatch<React.SetStateAction<boolean>>,
+  setVideoId: React.Dispatch<React.SetStateAction<string>>,
+  scoreJson: ScoreJson,
+) {
+  console.debug(`import scores JSON`)
+  console.debug(scoreJson)
+
+  // validate json structure
+  if (
+    !scoreJson ||
+    !Array.isArray(scoreJson.scores) ||
+    scoreJson.scores.length <= 0
+  ) {
+    window.alert("Error: empty scores data!")
+    return
+  }
+
+  // validate each time-click pair
+  for (const pair of scoreJson.scores) {
+    if (
+      !Array.isArray(pair) ||
+      pair.length !== 2 ||
+      typeof pair[0] !== "number" ||
+      typeof pair[1] !== "number" ||
+      !Number.isFinite(pair[0]) ||
+      !Number.isFinite(pair[1])
+    ) {
+      console.debug(pair)
+      window.alert("Error: incorrect scores format")
+      return
+    }
+  }
+
+  // sort pairs
+  scoreJson.scores.sort((a, b) => a[0] - b[0])
+
+  // change video and show confirmation popup
+  if (
+    !changeVideo(
+      youtubeVideoIdToUrl(scoreJson.videoId),
+      currentVideoId,
+      setScoreMap,
+      setVideoUrl,
+      setVideoReady,
+      setVideoId,
+    )
+  ) {
+    window.alert("Error: invalid video link")
+    return
+  }
+
+  // input is validated
+  importScoreMap(setScoreMap, scoreJson, true)
 }
 
 /**
@@ -123,7 +189,7 @@ export function downloadScores(
  * @param setVideoId
  * @returns void
  */
-export async function importScores(
+export async function importScoresFromFile(
   fileUploadElement: React.MutableRefObject<HTMLInputElement | null>,
   currentVideoId: string,
   setScoreMap: React.Dispatch<React.SetStateAction<Map<number, number>>>,
@@ -137,63 +203,24 @@ export async function importScores(
   }
 
   try {
-    // read json
+    // read json, catch potential parsing errors
     const scoreText = await scoreFiles[0].text()
     const scoreJson = JSON.parse(scoreText) as ScoreJson
-    console.debug(`import scores`)
-    console.debug(scoreJson)
+    console.debug(`import scores from file`)
 
     // reset reference
     if (fileUploadElement.current?.files) {
       fileUploadElement.current.files = null
     }
 
-    // validate json structure
-    if (
-      !scoreJson ||
-      !Array.isArray(scoreJson.scores) ||
-      scoreJson.scores.length <= 0
-    ) {
-      window.alert("Error: empty scores data!")
-      return
-    }
-
-    // validate each time-click pair
-    for (const pair of scoreJson.scores) {
-      if (
-        !Array.isArray(pair) ||
-        pair.length !== 2 ||
-        typeof pair[0] !== "number" ||
-        typeof pair[1] !== "number" ||
-        !Number.isFinite(pair[0]) ||
-        !Number.isFinite(pair[1])
-      ) {
-        console.debug(pair)
-        window.alert("Error: incorrect scores format")
-        return
-      }
-    }
-
-    // sort pairs
-    scoreJson.scores.sort((a, b) => a[0] - b[0])
-
-    // change video and show confirmation popup
-    if (
-      !changeVideo(
-        youtubeVideoIdToUrl(scoreJson.videoId),
-        currentVideoId,
-        setScoreMap,
-        setVideoUrl,
-        setVideoReady,
-        setVideoId,
-      )
-    ) {
-      window.alert("Error: invalid video link")
-      return
-    }
-
-    // input is validated
-    importScoreMap(setScoreMap, scoreJson, true)
+    importScoreJson(
+      currentVideoId,
+      setScoreMap,
+      setVideoUrl,
+      setVideoReady,
+      setVideoId,
+      scoreJson,
+    )
   } catch (error) {
     console.debug(error)
     if (fileUploadElement.current?.files) {
@@ -201,4 +228,61 @@ export async function importScores(
     }
     window.alert("Error: cannot understand scores!")
   }
+}
+
+/**
+ * publish scores to instantdb
+ * @param db
+ * @param videoId
+ * @param scoreMap
+ * @returns void
+ */
+export async function publishScores(
+  db: InstantReactWeb<ScoreJson, {}, false>,
+  videoId: string,
+  scoreMap: Map<number, number>,
+) {
+  console.debug(`publish scores ${videoId}`)
+
+  // missing data
+  if (!videoId || scoreMap.size <= 0) {
+    return
+  }
+
+  // generate score json
+  const scoreJson = await getScoreJson(
+    videoId,
+    "", // TODO: judge name
+    scoreMap,
+  )
+
+  // publish scores
+  db.transact(tx.scores[lookup("hash", scoreJson.hash)].update(scoreJson))
+    .then(() =>
+      window.alert(
+        `Score published:\n` +
+          `${window.location.origin}/?` +
+          `id=${encodeURIComponent(scoreJson.hash)}`,
+      ),
+    )
+    .catch((e) => {
+      // TODO: lookup not creating new id, is this a bug !?
+      if (e?.message === "Validation failed for lookup") {
+        db.transact(tx.scores[id()].update(scoreJson))
+          .then(() =>
+            window.alert(
+              `Score published:\n` +
+                `${window.location.origin}/?` +
+                `id=${encodeURIComponent(scoreJson.hash)}`,
+            ),
+          )
+          .catch((e) => {
+            console.debug(e)
+            window.alert("Error: score publish failed :[")
+          })
+      } else {
+        console.debug(e)
+        window.alert("Error: score publish failed :[")
+      }
+    })
 }

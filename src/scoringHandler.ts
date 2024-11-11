@@ -71,19 +71,17 @@ export function generateClickListener(
       return
     }
 
-    console.log(keyPositive, keyNegative)
+    // ignore keys held down
+    if (event.repeat) {
+      console.debug(`click repeat ${event.key}`)
+      return
+    }
 
     if (event.key === keyPositive || event.key === keyNegative) {
       // disable default key actions
       event.preventDefault()
       event.stopPropagation()
       event.stopImmediatePropagation()
-
-      // ignore keys held down
-      if (event.repeat) {
-        console.debug(`click repeat ${event.key}`)
-        return
-      }
 
       // get score
       const clickScore = event.key === keyPositive ? +1 : -1

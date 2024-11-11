@@ -1,3 +1,4 @@
+import { init } from "@instantdb/react"
 import { useEffect, useRef, useState } from "react"
 import YouTubePlayer from "react-player/youtube"
 
@@ -9,19 +10,48 @@ import {
   generateClickListener,
   resetScoreMap,
 } from "./scoringHandler"
-import { changeVideo, downloadScores, importScores } from "./userInputHandler"
-import { regainClickerFocus, youtubeVideoIdToUrl } from "./utils"
+import { ScoreJson } from "./types"
+import {
+  changeVideo,
+  downloadScores,
+  importScoreJson,
+  importScoresFromFile,
+  publishScores,
+} from "./userInputHandler"
+import {
+  getScoresPerSecond,
+  regainClickerFocus,
+  youtubeVideoIdToUrl,
+} from "./utils"
+
+const db = init<ScoreJson>({
+  appId: atob(`${import.meta.env.VITE_THE_CAT}`),
+})
 
 function App() {
   const [appMode, setAppMode] = useState(AppMode.Scoring)
 
   const youtubePlayer = useRef<YouTubePlayer | null>(null)
-  const [videoUrl, setVideoUrl] = useState("https://youtu.be/9hhMUT2U2L4")
+  const [videoUrl, setVideoUrl] = useState(
+    "https://www.youtube.com/watch?v=9hhMUT2U2L4",
+  )
   const [videoId, setVideoId] = useState("9hhMUT2U2L4")
   const [videoReady, setVideoReady] = useState(false)
   const [videoDuration, setVideoDuration] = useState(0)
 
   const [scoreMap, setScoreMap] = useState(new Map<number, number>())
+  const scoreMapArray = Array.from(scoreMap.entries())
+  const [scorePositive, scoreNegative] = scoreMapArray.reduce(
+    (sums, [_time, score]) => {
+      sums[score > 0 ? 0 : 1] += score
+      return sums
+    },
+    [0, 0],
+  )
+  const scoreTotal = scorePositive + scoreNegative
+  const totalTime =
+    Math.max(...scoreMapArray.flatMap(([time, _score]) => time)) -
+    Math.min(...scoreMapArray.flatMap(([time, _score]) => time))
 
   const filesDownloadElement = useRef<HTMLAnchorElement | null>(null)
   const fileUploadElement = useRef<HTMLInputElement | null>(null)
@@ -34,6 +64,42 @@ function App() {
     const localData = localStorage.getItem(StorageKey.KeyNegative)
     return localData ? JSON.parse(localData) : "s"
   })
+
+  useEffect(() => {
+    const url = new URL(window.location.href)
+    const params = new URLSearchParams(url.searchParams)
+    if (params.has("id")) {
+      // reset url
+      window.history.replaceState(null, "", "/")
+
+      // get recording id
+      const scoreHash = params.get("id")
+      console.debug(scoreHash)
+
+      db.queryOnce({ scores: { $: { where: { hash: scoreHash } } } })
+        .then(({ data }) => {
+          if (data.scores.length === 1) {
+            const scoreJson = data.scores[0] as unknown as ScoreJson
+            importScoreJson(
+              videoId,
+              setScoreMap,
+              setVideoUrl,
+              setVideoReady,
+              setVideoId,
+              scoreJson,
+            )
+          } else {
+            window.alert(
+              `Error: unable to find score :[\n` + `ID: ${scoreHash}`,
+            )
+          }
+        })
+        .catch((e) => {
+          console.debug(e)
+          window.alert(`Error: unable to find score :[\n` + `ID: ${scoreHash}`)
+        })
+    }
+  }, [])
 
   // add clicking key event listener
   useEffect(() => {
@@ -89,7 +155,7 @@ function App() {
 
     // start interval
     const intervalId = window.setInterval(
-      generateReplayFunction(youtubePlayer.current, Array.from(scoreMap)),
+      generateReplayFunction(youtubePlayer.current, scoreMapArray),
       INTERVAL_DELAY,
     )
 
@@ -115,21 +181,9 @@ function App() {
 
   return (
     <>
-      <button
-        id="app-mode"
-        name="app-mode"
-        onClick={() =>
-          appMode === AppMode.Playback
-            ? setAppMode(AppMode.Scoring)
-            : setAppMode(AppMode.Playback)
-        }
-        disabled={!(appMode === AppMode.Playback || scoreMap.size > 0)}
-      >
-        {appMode === AppMode.Scoring ? "Play Back Scores" : "Stop Play Back"}
-      </button>
+      <h1>44Clicker</h1>
 
-      <br></br>
-
+      <label htmlFor="video-id">YouTube Video Link: </label>
       <input
         id="video-id"
         name="video-id"
@@ -147,8 +201,8 @@ function App() {
         }
         required
       />
-      <p>Currently playing video ID: {videoId}</p>
 
+      <br></br>
       <br></br>
 
       <button
@@ -164,6 +218,7 @@ function App() {
             +1,
           )
         }
+        disabled={appMode !== AppMode.Scoring}
       >
         +1
       </button>
@@ -177,7 +232,9 @@ function App() {
         maxLength={1}
         required
       />
-
+      <span>
+        +{scorePositive} ({getScoresPerSecond(scorePositive, totalTime)})
+      </span>
       <br></br>
       <button
         id="click-negative"
@@ -192,6 +249,7 @@ function App() {
             -1,
           )
         }
+        disabled={appMode !== AppMode.Scoring}
       >
         -1
       </button>
@@ -205,6 +263,41 @@ function App() {
         maxLength={1}
         required
       />
+      {/* remove extra "-", we need the hardcoded "-" for "-0" */}
+      <span>
+        -{scoreNegative * -1} ({getScoresPerSecond(scoreNegative, totalTime)})
+      </span>
+
+      <br></br>
+
+      <span>
+        Total Score: {scoreTotal >= 0 ? "+" : ""}
+        {scoreTotal} ({getScoresPerSecond(scoreTotal, totalTime)})
+      </span>
+
+      <br></br>
+      <br></br>
+
+      <button
+        id="reset-scores"
+        name="reset-scores"
+        onClick={() => resetScoreMap(setScoreMap, false)}
+        disabled={appMode !== AppMode.Scoring || scoreMap.size <= 0}
+      >
+        Reset Scores
+      </button>
+      <button
+        id="app-mode"
+        name="app-mode"
+        onClick={() =>
+          appMode === AppMode.Playback
+            ? setAppMode(AppMode.Scoring)
+            : setAppMode(AppMode.Playback)
+        }
+        disabled={!(appMode === AppMode.Playback || scoreMap.size > 0)}
+      >
+        {appMode === AppMode.Scoring ? "Play Back Scores" : "Stop Play Back"}
+      </button>
 
       <br></br>
       <br></br>
@@ -234,17 +327,9 @@ function App() {
       <br></br>
 
       <button
-        id="reset-scores"
-        name="reset-scores"
-        onClick={() => resetScoreMap(setScoreMap, false)}
-        disabled={appMode !== AppMode.Scoring || scoreMap.size <= 0}
-      >
-        Reset Scores
-      </button>
-      <button
         id="download-scores"
         name="download-scores"
-        onClick={() => downloadScores(filesDownloadElement, scoreMap, videoId)}
+        onClick={() => downloadScores(filesDownloadElement, videoId, scoreMap)}
         disabled={scoreMap.size <= 0}
       >
         Download Scores
@@ -253,8 +338,17 @@ function App() {
         id="import-scores"
         name="import-scores"
         onClick={() => fileUploadElement.current?.click()}
+        disabled={appMode !== AppMode.Scoring}
       >
         Import Scores
+      </button>
+      <button
+        id="publish-scores"
+        name="publish-scores"
+        onClick={() => publishScores(db, videoId, scoreMap)}
+        disabled={appMode !== AppMode.Scoring || scoreMap.size <= 0}
+      >
+        Publish Scores
       </button>
 
       <br></br>
@@ -270,7 +364,7 @@ function App() {
       <input
         ref={fileUploadElement}
         onChange={() =>
-          importScores(
+          importScoresFromFile(
             fileUploadElement,
             videoId,
             setScoreMap,
