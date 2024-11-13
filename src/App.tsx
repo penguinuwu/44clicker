@@ -41,17 +41,27 @@ function App() {
 
   const [scoreMap, setScoreMap] = useState(new Map<number, number>())
   const scoreMapArray = Array.from(scoreMap.entries())
-  const [scorePositive, scoreNegative] = scoreMapArray.reduce(
-    (sums, [_time, score]) => {
-      sums[score > 0 ? 0 : 1] += score
-      return sums
-    },
-    [0, 0],
-  )
-  const scoreTotal = scorePositive + scoreNegative
-  const totalTime =
-    Math.max(...scoreMapArray.flatMap(([time, _score]) => time)) -
-    Math.min(...scoreMapArray.flatMap(([time, _score]) => time))
+  const [replayIndex, setReplayIndex] = useState(-1)
+  const displayScoreMapArray =
+    appMode === AppMode.Playback &&
+    replayIndex >= 0 &&
+    replayIndex < scoreMap.size
+      ? scoreMapArray.slice(0, replayIndex)
+      : scoreMapArray
+  const [displayScorePositive, displayScoreNegative] =
+    displayScoreMapArray.reduce(
+      (sums, [_time, score]) => {
+        // sums[0]: positive, sums[1]: negative
+        sums[score > 0 ? 0 : 1] += score
+        return sums
+      },
+      // [positive, negative]
+      [0, 0],
+    )
+  const displayScoreTotal = displayScorePositive + displayScoreNegative
+  const displayTotalTime =
+    Math.max(...displayScoreMapArray.flatMap(([time, _score]) => time)) -
+    Math.min(...displayScoreMapArray.flatMap(([time, _score]) => time))
 
   const filesDownloadElement = useRef<HTMLAnchorElement | null>(null)
   const fileUploadElement = useRef<HTMLInputElement | null>(null)
@@ -65,6 +75,7 @@ function App() {
     return localData ? JSON.parse(localData) : "s"
   })
 
+  // parse url query parameters for video replay
   useEffect(() => {
     const url = new URL(window.location.href)
     const params = new URLSearchParams(url.searchParams)
@@ -134,6 +145,7 @@ function App() {
     keyNegative,
   ])
 
+  // add replay loop
   useEffect(() => {
     if (appMode !== AppMode.Playback) {
       return
@@ -155,7 +167,11 @@ function App() {
 
     // start interval
     const intervalId = window.setInterval(
-      generateReplayFunction(youtubePlayer.current, scoreMapArray),
+      generateReplayFunction(
+        youtubePlayer.current,
+        scoreMapArray,
+        setReplayIndex,
+      ),
       INTERVAL_DELAY,
     )
 
@@ -169,6 +185,7 @@ function App() {
       if (youtubePlayer.current) {
         youtubePlayer.current.getInternalPlayer().pauseVideo()
       }
+      setReplayIndex(-1)
     }
   }, [
     appMode,
@@ -233,7 +250,8 @@ function App() {
         required
       />
       <span>
-        +{scorePositive} ({getScoresPerSecond(scorePositive, totalTime)})
+        +{displayScorePositive} (
+        {getScoresPerSecond(displayScorePositive, displayTotalTime)})
       </span>
       <br></br>
       <button
@@ -265,14 +283,16 @@ function App() {
       />
       {/* remove extra "-", we need the hardcoded "-" for "-0" */}
       <span>
-        -{scoreNegative * -1} ({getScoresPerSecond(scoreNegative, totalTime)})
+        -{displayScoreNegative * -1} (
+        {getScoresPerSecond(displayScoreNegative, displayTotalTime)})
       </span>
 
       <br></br>
 
       <span>
-        Total Score: {scoreTotal >= 0 ? "+" : ""}
-        {scoreTotal} ({getScoresPerSecond(scoreTotal, totalTime)})
+        Total Score: {displayScoreTotal >= 0 ? "+" : ""}
+        {displayScoreTotal} (
+        {getScoresPerSecond(displayScoreTotal, displayTotalTime)})
       </span>
 
       <br></br>
@@ -300,6 +320,17 @@ function App() {
       </button>
 
       <br></br>
+
+      {appMode === AppMode.Playback && (
+        <>
+          <p>
+            {replayIndex !== -1
+              ? "Playing scoring replay..."
+              : "Scoring replay finished"}
+          </p>
+        </>
+      )}
+
       <br></br>
 
       <YouTubePlayer

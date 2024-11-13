@@ -12,12 +12,16 @@ import { clickerFlash } from "./scoringHandler"
 export function generateReplayFunction(
   youtubePlayer: YouTubePlayer,
   scoreMapFlat: [number, number][],
+  setReplayIndex: React.Dispatch<React.SetStateAction<number>>,
 ) {
   // function scoped variables
   // idk if this is good practice lol
   // i just need some way to persist data through intervals
   let previousTime = youtubePlayer.getCurrentTime()
-  let scoreMapIndex: number | null = null
+
+  // current index of scoreMapFlat, -1 means invalid
+  let scoreMapIndex = -1
+  setReplayIndex(0)
 
   const lastClickTime = scoreMapFlat.reduce(
     (maxTime, click) => Math.max(maxTime, click[0]),
@@ -46,9 +50,9 @@ export function generateReplayFunction(
       previousTime - currentTime < INTERVAL_DELAY_THRESHOLD
     ) {
       console.debug(
-        `playback: out-of-order rewind by ${
-          previousTime - currentTime
-        } - ${previousTime} -> ${currentTime}`,
+        `playback: out-of-order rewind by ` +
+          `${previousTime - currentTime} - ` +
+          `${previousTime} -> ${currentTime}`,
       )
       return
     }
@@ -67,7 +71,7 @@ export function generateReplayFunction(
           `ff: ${previousTime + INTERVAL_DELAY_THRESHOLD < currentTime}`,
       )
       previousTime = currentTime
-      scoreMapIndex = null
+      scoreMapIndex = -1
       return
     }
 
@@ -76,12 +80,13 @@ export function generateReplayFunction(
     if (previousTime > lastClickTime) {
       console.debug(`playback: no more clicks after ${lastClickTime}`)
       previousTime = currentTime
-      scoreMapIndex = null
+      scoreMapIndex = -1
+      setReplayIndex(scoreMapIndex)
       return
     }
 
     // find next click index
-    if (scoreMapIndex === null) {
+    if (scoreMapIndex === -1) {
       console.debug(
         `playback: scoreMapIndex undefined (${previousTime}, ${currentTime}]`,
       )
@@ -92,6 +97,7 @@ export function generateReplayFunction(
       scoreMapIndex = scoreMapFlat.findIndex(
         ([clickTime, _click]) => previousTime < clickTime,
       )
+      setReplayIndex(scoreMapIndex)
 
       // no more upcoming clicks
       // catch up previousTime, reset scoreMapIndex, go to next iteration
@@ -100,7 +106,6 @@ export function generateReplayFunction(
           `playback: next click index not found after ${previousTime}`,
         )
         previousTime = currentTime
-        scoreMapIndex = null
         return
       }
     }
@@ -116,7 +121,9 @@ export function generateReplayFunction(
 
       console.debug(`playback: click ${click} at ${timestamp}`)
       clickerFlash(click)
+
       scoreMapIndex++
+      setReplayIndex(scoreMapIndex)
     }
 
     previousTime = currentTime
