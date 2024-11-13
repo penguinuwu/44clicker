@@ -1,5 +1,6 @@
 import { id, InstantReactWeb, tx } from "@instantdb/react"
 
+import { JUDGE_NAME_LIMIT } from "./constants"
 import { importScoreMap, resetScoreMap } from "./scoringHandler"
 import { ScoreJson } from "./types"
 import { getScoreJson, youtubeVideoIdToUrl } from "./utils"
@@ -73,12 +74,14 @@ export function changeVideo(
  * download scores
  * @param filesDownloadElement
  * @param videoId
+ * @param judgeName
  * @param scoreMap
  * @returns void
  */
 export async function downloadScores(
   filesDownloadElement: React.MutableRefObject<HTMLAnchorElement | null>,
   videoId: string,
+  judgeName: string,
   scoreMap: Map<number, number>,
 ) {
   console.debug(`download scores ${videoId}`)
@@ -89,11 +92,7 @@ export async function downloadScores(
   }
 
   // generate score json
-  const scoreJson = await getScoreJson(
-    videoId,
-    "", // TODO: judge name
-    scoreMap,
-  )
+  const scoreJson = await getScoreJson(videoId, judgeName, scoreMap)
 
   // set download file name and file content
   filesDownloadElement.current.setAttribute(
@@ -117,6 +116,7 @@ export async function downloadScores(
  * @param setVideoUrl
  * @param setVideoReady
  * @param setVideoId
+ * @param setJudgeName
  * @param scoreJson
  * @returns
  */
@@ -126,6 +126,7 @@ export async function importScoreJson(
   setVideoUrl: React.Dispatch<React.SetStateAction<string>>,
   setVideoReady: React.Dispatch<React.SetStateAction<boolean>>,
   setVideoId: React.Dispatch<React.SetStateAction<string>>,
+  setJudgeName: React.Dispatch<React.SetStateAction<string>>,
   scoreJson: ScoreJson,
 ) {
   console.debug(`import scores JSON`)
@@ -140,6 +141,8 @@ export async function importScoreJson(
     window.alert("Error: empty scores data!")
     return
   }
+
+  setJudgeName(scoreJson.judgeName.substring(0, JUDGE_NAME_LIMIT))
 
   // validate each time-click pair
   for (const pair of scoreJson.scores) {
@@ -187,6 +190,7 @@ export async function importScoreJson(
  * @param setVideoUrl
  * @param setVideoReady
  * @param setVideoId
+ * @param setJudgeName
  * @returns void
  */
 export async function importScoresFromFile(
@@ -196,6 +200,7 @@ export async function importScoresFromFile(
   setVideoUrl: React.Dispatch<React.SetStateAction<string>>,
   setVideoReady: React.Dispatch<React.SetStateAction<boolean>>,
   setVideoId: React.Dispatch<React.SetStateAction<string>>,
+  setJudgeName: React.Dispatch<React.SetStateAction<string>>,
 ) {
   const scoreFiles = fileUploadElement.current?.files
   if (!scoreFiles?.length || scoreFiles.length <= 0) {
@@ -219,6 +224,7 @@ export async function importScoresFromFile(
       setVideoUrl,
       setVideoReady,
       setVideoId,
+      setJudgeName,
       scoreJson,
     )
   } catch (error) {
@@ -234,12 +240,14 @@ export async function importScoresFromFile(
  * publish scores to instantdb
  * @param db
  * @param videoId
+ * @param judgeName
  * @param scoreMap
  * @returns void
  */
 export async function publishScores(
   db: InstantReactWeb<ScoreJson, {}, false>,
   videoId: string,
+  judgeName: string,
   scoreMap: Map<number, number>,
 ) {
   console.debug(`publish scores ${videoId}`)
@@ -250,11 +258,7 @@ export async function publishScores(
   }
 
   // generate score json
-  const scoreJson = await getScoreJson(
-    videoId,
-    "", // TODO: judge name
-    scoreMap,
-  )
+  const scoreJson = await getScoreJson(videoId, judgeName, scoreMap)
 
   const url =
     `${window.location.origin}/?` + `id=${encodeURIComponent(scoreJson.hash)}`

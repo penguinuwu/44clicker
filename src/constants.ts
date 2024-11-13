@@ -1,5 +1,5 @@
 export enum StorageKey {
-  JudgeName = "JUDGE_NAME", // TODO: not implemented yet
+  JudgeName = "JUDGE_NAME",
   KeyPositive = "KEY_POSITIVE",
   KeyNegative = "KEY_NEGATIVE",
 }
@@ -17,6 +17,8 @@ export enum PlayerStates {
   BUFFERING = 3,
   VIDEO_CUED = 5,
 }
+
+export const JUDGE_NAME_LIMIT = 30
 
 // interval delay in milliseconds
 // humans can perceive every ~10ms

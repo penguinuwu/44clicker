@@ -3,7 +3,12 @@ import { useEffect, useRef, useState } from "react"
 import YouTubePlayer from "react-player/youtube"
 
 import "./App.css"
-import { AppMode, INTERVAL_DELAY, StorageKey } from "./constants"
+import {
+  AppMode,
+  INTERVAL_DELAY,
+  JUDGE_NAME_LIMIT,
+  StorageKey,
+} from "./constants"
 import { generateReplayFunction } from "./replayHandler"
 import {
   addClick,
@@ -29,8 +34,10 @@ const db = init<ScoreJson>({
 })
 
 function App() {
+  // web app mode
   const [appMode, setAppMode] = useState(AppMode.Scoring)
 
+  // video information
   const youtubePlayer = useRef<YouTubePlayer | null>(null)
   const [videoUrl, setVideoUrl] = useState(
     "https://www.youtube.com/watch?v=9hhMUT2U2L4",
@@ -39,8 +46,11 @@ function App() {
   const [videoReady, setVideoReady] = useState(false)
   const [videoDuration, setVideoDuration] = useState(0)
 
+  // score data
   const [scoreMap, setScoreMap] = useState(new Map<number, number>())
   const scoreMapArray = Array.from(scoreMap.entries())
+
+  // replay and score displays
   const [replayIndex, setReplayIndex] = useState(-1)
   const displayScoreMapArray =
     appMode === AppMode.Playback &&
@@ -63,9 +73,11 @@ function App() {
     Math.max(...displayScoreMapArray.flatMap(([time, _score]) => time)) -
     Math.min(...displayScoreMapArray.flatMap(([time, _score]) => time))
 
+  // download/upload fields
   const filesDownloadElement = useRef<HTMLAnchorElement | null>(null)
   const fileUploadElement = useRef<HTMLInputElement | null>(null)
 
+  // user input fields
   const [keyPositive, setKeyPositive] = useState(() => {
     const localData = localStorage.getItem(StorageKey.KeyPositive)
     return localData ? JSON.parse(localData) : "a"
@@ -73,6 +85,10 @@ function App() {
   const [keyNegative, setKeyNegative] = useState(() => {
     const localData = localStorage.getItem(StorageKey.KeyNegative)
     return localData ? JSON.parse(localData) : "s"
+  })
+  const [judgeName, setJudgeName] = useState(() => {
+    const localData = localStorage.getItem(StorageKey.JudgeName)
+    return localData ? JSON.parse(localData) : ""
   })
 
   // parse url query parameters for video replay
@@ -97,6 +113,7 @@ function App() {
               setVideoUrl,
               setVideoReady,
               setVideoId,
+              setJudgeName,
               scoreJson,
             )
           } else {
@@ -217,6 +234,17 @@ function App() {
           )
         }
         required
+      />
+      <br />
+      <label htmlFor="judge-name">Judge Name: </label>
+      <input
+        id="judge-name"
+        name="judge-name"
+        type="text"
+        value={judgeName}
+        onChange={(e) => setJudgeName(e.target.value)}
+        maxLength={JUDGE_NAME_LIMIT}
+        disabled={appMode !== AppMode.Scoring}
       />
 
       <br></br>
@@ -360,7 +388,9 @@ function App() {
       <button
         id="download-scores"
         name="download-scores"
-        onClick={() => downloadScores(filesDownloadElement, videoId, scoreMap)}
+        onClick={() =>
+          downloadScores(filesDownloadElement, videoId, judgeName, scoreMap)
+        }
         disabled={scoreMap.size <= 0}
       >
         Download Scores
@@ -376,7 +406,7 @@ function App() {
       <button
         id="publish-scores"
         name="publish-scores"
-        onClick={() => publishScores(db, videoId, scoreMap)}
+        onClick={() => publishScores(db, videoId, judgeName, scoreMap)}
         disabled={appMode !== AppMode.Scoring || scoreMap.size <= 0}
       >
         Publish Scores
@@ -402,6 +432,7 @@ function App() {
             setVideoUrl,
             setVideoReady,
             setVideoId,
+            setJudgeName,
           )
         }
         type="file"

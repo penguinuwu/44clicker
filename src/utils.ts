@@ -1,4 +1,4 @@
-import { AppMode } from "./constants"
+import { AppMode, JUDGE_NAME_LIMIT } from "./constants"
 import { ScoreJson } from "./types"
 
 /**
@@ -128,7 +128,7 @@ export async function getScoreJson(
   const scoreJson: ScoreJson = {
     hash: scoreId,
     videoId: videoId,
-    judgeName: judgeName,
+    judgeName: judgeName.substring(0, JUDGE_NAME_LIMIT),
     date: Date.now(),
     scores: scoreArray,
   }
