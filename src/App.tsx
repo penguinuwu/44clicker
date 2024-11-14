@@ -98,7 +98,7 @@ function App() {
     const params = new URLSearchParams(url.searchParams)
     if (params.has("id")) {
       // reset url
-      // window.history.replaceState(null, "", "/")
+      window.history.replaceState(null, "", "/")
 
       // get recording id
       const scoreHash = params.get("id")
