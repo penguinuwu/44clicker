@@ -304,6 +304,16 @@ function App() {
       <br />
       <br />
 
+      {appMode === AppMode.Playback && (
+        <>
+          <p>
+            {replayIndex !== -1
+              ? "Playing score replay..."
+              : "Scoring replay finished"}
+          </p>
+        </>
+      )}
+
       <button
         id="click-positive"
         name="click-positive"
@@ -378,16 +388,6 @@ function App() {
         {displayScoreTotal} (
         {getScoresPerSecond(displayScoreTotal, displayTotalTime)})
       </p>
-
-      {appMode === AppMode.Playback && (
-        <>
-          <p>
-            {replayIndex !== -1
-              ? "Playing scoring replay..."
-              : "Scoring replay finished"}
-          </p>
-        </>
-      )}
 
       <YouTubePlayer
         id="youtube-player"
