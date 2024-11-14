@@ -142,8 +142,6 @@ export async function importScoreJson(
     return
   }
 
-  setJudgeName(scoreJson.judgeName.substring(0, JUDGE_NAME_LIMIT))
-
   // validate each time-click pair
   for (const pair of scoreJson.scores) {
     if (
@@ -177,6 +175,8 @@ export async function importScoreJson(
     window.alert("Error: invalid video link")
     return
   }
+
+  setJudgeName(scoreJson.judgeName.substring(0, JUDGE_NAME_LIMIT))
 
   // input is validated
   importScoreMap(setScoreMap, scoreJson, true)

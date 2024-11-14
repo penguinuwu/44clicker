@@ -9,6 +9,7 @@ import {
   JUDGE_NAME_LIMIT,
   StorageKey,
 } from "./constants"
+import LookAtThisGraph from "./graf/LookAtThisGraph"
 import { generateReplayFunction } from "./replayHandler"
 import {
   addClick,
@@ -97,7 +98,7 @@ function App() {
     const params = new URLSearchParams(url.searchParams)
     if (params.has("id")) {
       // reset url
-      window.history.replaceState(null, "", "/")
+      // window.history.replaceState(null, "", "/")
 
       // get recording id
       const scoreHash = params.get("id")
@@ -247,8 +248,61 @@ function App() {
         disabled={appMode !== AppMode.Scoring}
       />
 
-      <br></br>
-      <br></br>
+      <br />
+      <br />
+
+      <button
+        id="reset-scores"
+        name="reset-scores"
+        onClick={() => resetScoreMap(setScoreMap, false)}
+        disabled={appMode !== AppMode.Scoring || scoreMap.size <= 0}
+      >
+        Reset Scores
+      </button>
+      <button
+        id="app-mode"
+        name="app-mode"
+        onClick={() =>
+          appMode === AppMode.Playback
+            ? setAppMode(AppMode.Scoring)
+            : setAppMode(AppMode.Playback)
+        }
+        disabled={!(appMode === AppMode.Playback || scoreMap.size > 0)}
+      >
+        {appMode === AppMode.Scoring ? "Play Back Scores" : "Stop Play Back"}
+      </button>
+
+      <br />
+
+      <button
+        id="download-scores"
+        name="download-scores"
+        onClick={() =>
+          downloadScores(filesDownloadElement, videoId, judgeName, scoreMap)
+        }
+        disabled={scoreMap.size <= 0}
+      >
+        Download Scores
+      </button>
+      <button
+        id="import-scores"
+        name="import-scores"
+        onClick={() => fileUploadElement.current?.click()}
+        disabled={appMode !== AppMode.Scoring}
+      >
+        Import Scores
+      </button>
+      <button
+        id="publish-scores"
+        name="publish-scores"
+        onClick={() => publishScores(db, videoId, judgeName, scoreMap)}
+        disabled={appMode !== AppMode.Scoring || scoreMap.size <= 0}
+      >
+        Publish Scores
+      </button>
+
+      <br />
+      <br />
 
       <button
         id="click-positive"
@@ -281,7 +335,9 @@ function App() {
         +{displayScorePositive} (
         {getScoresPerSecond(displayScorePositive, displayTotalTime)})
       </span>
-      <br></br>
+
+      <br />
+
       <button
         id="click-negative"
         name="click-negative"
@@ -315,39 +371,13 @@ function App() {
         {getScoresPerSecond(displayScoreNegative, displayTotalTime)})
       </span>
 
-      <br></br>
+      <br />
 
-      <span>
+      <p>
         Total Score: {displayScoreTotal >= 0 ? "+" : ""}
         {displayScoreTotal} (
         {getScoresPerSecond(displayScoreTotal, displayTotalTime)})
-      </span>
-
-      <br></br>
-      <br></br>
-
-      <button
-        id="reset-scores"
-        name="reset-scores"
-        onClick={() => resetScoreMap(setScoreMap, false)}
-        disabled={appMode !== AppMode.Scoring || scoreMap.size <= 0}
-      >
-        Reset Scores
-      </button>
-      <button
-        id="app-mode"
-        name="app-mode"
-        onClick={() =>
-          appMode === AppMode.Playback
-            ? setAppMode(AppMode.Scoring)
-            : setAppMode(AppMode.Playback)
-        }
-        disabled={!(appMode === AppMode.Playback || scoreMap.size > 0)}
-      >
-        {appMode === AppMode.Scoring ? "Play Back Scores" : "Stop Play Back"}
-      </button>
-
-      <br></br>
+      </p>
 
       {appMode === AppMode.Playback && (
         <>
@@ -359,15 +389,16 @@ function App() {
         </>
       )}
 
-      <br></br>
-
       <YouTubePlayer
         id="youtube-player"
         url={youtubeVideoIdToUrl(videoId)}
         controls={true}
-        onDuration={setVideoDuration}
+        // onDuration={setVideoDuration} // this seems unreliable
         onError={window.alert}
-        onReady={() => setVideoReady(true)}
+        onReady={() => {
+          setVideoReady(true)
+          setVideoDuration(youtubePlayer.current?.getDuration()!)
+        }}
         onStart={() => regainClickerFocus(appMode)}
         onPlay={() => regainClickerFocus(appMode)}
         onPause={() => regainClickerFocus(appMode)}
@@ -383,36 +414,24 @@ function App() {
         ref={youtubePlayer}
       />
 
-      <br></br>
+      <br />
 
-      <button
-        id="download-scores"
-        name="download-scores"
-        onClick={() =>
-          downloadScores(filesDownloadElement, videoId, judgeName, scoreMap)
-        }
-        disabled={scoreMap.size <= 0}
-      >
-        Download Scores
-      </button>
-      <button
-        id="import-scores"
-        name="import-scores"
-        onClick={() => fileUploadElement.current?.click()}
-        disabled={appMode !== AppMode.Scoring}
-      >
-        Import Scores
-      </button>
-      <button
-        id="publish-scores"
-        name="publish-scores"
-        onClick={() => publishScores(db, videoId, judgeName, scoreMap)}
-        disabled={appMode !== AppMode.Scoring || scoreMap.size <= 0}
-      >
-        Publish Scores
-      </button>
+      <LookAtThisGraph
+        appMode={appMode}
+        youtubePlayer={youtubePlayer}
+        videoDuration={videoDuration}
+        scoreMapArray={displayScoreMapArray}
+        setScoreMap={setScoreMap}
+      />
 
-      <br></br>
+      <br />
+
+      <textarea
+        value={JSON.stringify(Object.fromEntries(scoreMap), null, 4)}
+        rows={scoreMap.size + 3}
+        cols={50}
+        disabled={true}
+      ></textarea>
 
       {/* elements to trigger file download */}
       <a
@@ -440,15 +459,6 @@ function App() {
         style={{ display: "none", visibility: "hidden" }}
         hidden
       />
-
-      <br></br>
-
-      <textarea
-        value={JSON.stringify(Object.fromEntries(scoreMap), null, 4)}
-        rows={scoreMap.size + 3}
-        cols={50}
-        disabled={true}
-      ></textarea>
     </>
   )
 }
