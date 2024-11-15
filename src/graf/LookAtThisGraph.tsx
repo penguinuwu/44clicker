@@ -12,8 +12,8 @@ interface Props {
   appMode: AppMode
   youtubePlayer: React.MutableRefObject<YouTubePlayer | null>
   videoDuration: number
+  displayScoreMapArray: [number, number][]
   scoreMapArray: [number, number][]
-  scoreMap: Map<number, number>
   setScoreMap: React.Dispatch<React.SetStateAction<Map<number, number>>>
 }
 
@@ -21,8 +21,8 @@ function LookAtThisGraph({
   appMode,
   youtubePlayer,
   videoDuration,
+  displayScoreMapArray,
   scoreMapArray,
-  scoreMap,
   setScoreMap,
 }: Props) {
   const [chart, setChart] = useState<Highcharts.Chart | null>(null)
@@ -70,11 +70,10 @@ function LookAtThisGraph({
               marker: { symbol: "circle" },
               findNearestPointBy: "x",
               stickyTracking: true,
-              data: Array.from(scoreMap)
-                .filter(([_t, c]) => c > 0)
-                .map(([t, c]) => {
-                  return { x: t * 1000, y: c }
-                }),
+              data: scoreMapArray.map(([t, c]) => {
+                // map values to null instead of filtering to preserve index
+                return { x: t * 1000, y: c > 0 ? c : null }
+              }),
             },
             {
               name: "Score -1",
@@ -83,11 +82,10 @@ function LookAtThisGraph({
               marker: { symbol: "circle" },
               findNearestPointBy: "x",
               stickyTracking: true,
-              data: Array.from(scoreMap)
-                .filter(([_t, c]) => c < 0)
-                .map(([t, c]) => {
-                  return { x: t * 1000, y: c }
-                }),
+              data: scoreMapArray.map(([t, c]) => {
+                // map values to null instead of filtering to preserve index
+                return { x: t * 1000, y: c < 0 ? c : null }
+              }),
             },
             {
               name: "Total Score",
@@ -113,7 +111,7 @@ function LookAtThisGraph({
                 symbol: "circle",
                 radius: 2,
               },
-              data: scoreMapArray.map(
+              data: displayScoreMapArray.map(
                 // https://stackoverflow.com/a/47095386
                 (
                   (sum) =>
@@ -156,7 +154,7 @@ function LookAtThisGraph({
                   // array timestamp used, point.x might have float error
                   // go to 1 second before the click
                   youtubePlayer.current?.seekTo(
-                    Math.max(scoreMapArray[point.index][0] - 1, 0),
+                    Math.max(scoreMapArray[point.index][0] - 2, 0),
                   )
                   youtubePlayer.current?.getInternalPlayer()?.playVideo()
                 }}

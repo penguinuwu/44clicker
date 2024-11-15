@@ -37,7 +37,7 @@ function MyToolTip({ chart, children }: Props) {
           chart.tooltip.hide(0)
         }
 
-        console.info(this)
+        console.debug(this)
         setContext(this)
 
         return `<div id="${generateTooltipId(chart.index)}"></div>`
@@ -52,14 +52,14 @@ function MyToolTip({ chart, children }: Props) {
     }
   }, [chart?.tooltip])
 
-  console.info(context)
+  console.debug(context)
 
   useEffect(() => {
     if (context) {
       const tooltip: any = context.series.chart.tooltip
       const textEl = tooltip.label.text.element
 
-      console.info(textEl.offsetWidth)
+      console.debug(textEl.offsetWidth)
       tooltip.label.box.attr({
         height: textEl.offsetHeight + 12,
         width: textEl.offsetWidth + 16,

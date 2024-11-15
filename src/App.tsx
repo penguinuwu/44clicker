@@ -420,8 +420,8 @@ function App() {
         appMode={appMode}
         youtubePlayer={youtubePlayer}
         videoDuration={videoDuration}
-        scoreMapArray={displayScoreMapArray}
-        scoreMap={scoreMap}
+        displayScoreMapArray={displayScoreMapArray}
+        scoreMapArray={scoreMapArray}
         setScoreMap={setScoreMap}
       />
 
