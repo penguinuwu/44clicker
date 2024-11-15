@@ -32,8 +32,14 @@ function LookAtThisGraph({
         highcharts={Highcharts}
         options={{
           title: { text: "Technical Evaluation Score Graph" },
+          subtitle: {
+            text:
+              document.ontouchstart === undefined
+                ? "Click and drag in the plot area to zoom in"
+                : "Pinch the chart to zoom in",
+          },
           credits: { text: "🤍" },
-          chart: { animation: true },
+          chart: { animation: true, zooming: { type: "x" } },
           xAxis: {
             title: { text: "Video Time" },
             type: "datetime",
@@ -134,7 +140,10 @@ function LookAtThisGraph({
               <button
                 onClick={() => {
                   // array timestamp used, point.x might have float error
-                  youtubePlayer.current?.seekTo(scoreMapArray[point.index][0])
+                  // go to 1 second before the click
+                  youtubePlayer.current?.seekTo(
+                    Math.max(scoreMapArray[point.index][0] - 1, 0),
+                  )
                   youtubePlayer.current?.getInternalPlayer()?.playVideo()
                 }}
               >

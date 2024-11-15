@@ -17,6 +17,10 @@ interface Props {
   children(formatterContext: TooltipFormatterContextObject): JSX.Element
 }
 
+/**
+ * this thread is so good
+ * https://www.highcharts.com/forum/viewtopic.php?t=50147
+ */
 function MyToolTip({ chart, children }: Props) {
   const isInit = useRef(false)
   const [context, setContext] = useState<TooltipFormatterContextObject | null>(
@@ -43,10 +47,6 @@ function MyToolTip({ chart, children }: Props) {
         tooltip: {
           formatter,
           useHTML: true,
-          style: {
-            "vertical-algin": "top",
-            top: "0px",
-          },
         },
       })
     }
