@@ -49,7 +49,7 @@ function App() {
 
   // score data
   const [scoreMap, setScoreMap] = useState(new Map<number, number>())
-  const scoreMapArray = Array.from(scoreMap.entries())
+  const scoreMapArray = Array.from(scoreMap)
 
   // replay and score displays
   const [replayIndex, setReplayIndex] = useState(-1)
@@ -421,6 +421,7 @@ function App() {
         youtubePlayer={youtubePlayer}
         videoDuration={videoDuration}
         scoreMapArray={displayScoreMapArray}
+        scoreMap={scoreMap}
         setScoreMap={setScoreMap}
       />
 

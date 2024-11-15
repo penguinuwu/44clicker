@@ -114,7 +114,7 @@ export async function getScoreJson(
   scoreMap: Map<number, number>,
 ) {
   // make sure scores are sorted by timestamp
-  const scoreArray = Array.from(scoreMap.entries())
+  const scoreArray = Array.from(scoreMap)
   scoreArray.sort((a, b) => a[0] - b[0])
 
   // get hash of video ID and scores array

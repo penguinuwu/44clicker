@@ -13,6 +13,7 @@ interface Props {
   youtubePlayer: React.MutableRefObject<YouTubePlayer | null>
   videoDuration: number
   scoreMapArray: [number, number][]
+  scoreMap: Map<number, number>
   setScoreMap: React.Dispatch<React.SetStateAction<Map<number, number>>>
 }
 
@@ -21,6 +22,7 @@ function LookAtThisGraph({
   youtubePlayer,
   videoDuration,
   scoreMapArray,
+  scoreMap,
   setScoreMap,
 }: Props) {
   const [chart, setChart] = useState<Highcharts.Chart | null>(null)
@@ -62,18 +64,30 @@ function LookAtThisGraph({
           },
           series: [
             {
-              name: "Clicks",
+              name: "Score +1",
               type: "scatter",
-              stickyTracking: true,
-              symbol: "circle",
+              color: "lightgreen",
+              marker: { symbol: "circle" },
               findNearestPointBy: "x",
-              data: scoreMapArray.map(([t, c]) => {
-                return {
-                  x: t * 1000,
-                  y: c,
-                  color: c >= 0 ? "lightgreen" : "lightcoral",
-                }
-              }),
+              stickyTracking: true,
+              data: Array.from(scoreMap)
+                .filter(([_t, c]) => c > 0)
+                .map(([t, c]) => {
+                  return { x: t * 1000, y: c }
+                }),
+            },
+            {
+              name: "Score -1",
+              type: "scatter",
+              color: "lightcoral",
+              marker: { symbol: "circle" },
+              findNearestPointBy: "x",
+              stickyTracking: true,
+              data: Array.from(scoreMap)
+                .filter(([_t, c]) => c < 0)
+                .map(([t, c]) => {
+                  return { x: t * 1000, y: c }
+                }),
             },
             {
               name: "Total Score",
