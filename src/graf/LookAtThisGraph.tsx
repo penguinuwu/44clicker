@@ -1,5 +1,11 @@
+import DeleteIcon from "@mui/icons-material/Delete"
+import ReplayIcon from "@mui/icons-material/Replay"
+import Button from "@mui/material/Button"
+import Stack from "@mui/material/Stack"
+import Typography from "@mui/material/Typography"
 import Highcharts, { Chart } from "highcharts"
 import HighchartsReact from "highcharts-react-official"
+// import "highcharts/css/highcharts.css" // disabled, tooltip broken
 import { useCallback, useState } from "react"
 import YouTubePlayer from "react-player/youtube"
 
@@ -32,16 +38,21 @@ function LookAtThisGraph({
     <>
       <HighchartsReact
         highcharts={Highcharts}
+        containerProps={{ style: { flexGrow: 1 } }}
         options={{
-          title: { text: "Technical Evaluation Score Graph" },
+          title: { text: "Technical Evaluation Score" },
           subtitle: {
             text:
               document.ontouchstart === undefined
-                ? "Click and drag in the plot area to zoom in"
-                : "Pinch the chart to zoom in",
+                ? "Click and drag in the plot area to zoom in / Click on the points to view or delete clicks"
+                : "Pinch the chart to zoom in / Tap on the points to view or delete clicks",
           },
           credits: { text: "🤍" },
-          chart: { animation: true, zooming: { type: "x" } },
+          chart: {
+            animation: true,
+            zooming: { type: "x" },
+            // styledMode: true, // disabled, tooltip broken
+          },
           xAxis: {
             title: { text: "Video Time" },
             type: "datetime",
@@ -102,8 +113,8 @@ function LookAtThisGraph({
               negativeFillColor: {
                 linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
                 stops: [
-                  [0, "#f08080"],
-                  [1, Highcharts.color("#f08080").setOpacity(0).get("rgba")],
+                  [0, Highcharts.color("#f08080").setOpacity(0).get("rgba")],
+                  [1, "#f08080"],
                 ],
               },
               marker: {
@@ -123,19 +134,10 @@ function LookAtThisGraph({
           ],
           tooltip: {
             useHTML: true,
-            backgroundColor: "#000000",
-            borderRadius: 6,
-            borderColor: "#000000",
-            valueDecimals: 2,
             animation: true,
-            style: {
-              color: "white",
-              opacity: 0.75,
-              pointerEvents: "auto",
-            },
             hideDelay: 100,
-            outside: true,
             stickOnContact: true,
+            // outside: true,
             // followPointer: true,
           },
         }}
@@ -148,8 +150,10 @@ function LookAtThisGraph({
         youtubePlayer={youtubePlayer}
         children={({ point }) => {
           return (
-            <>
-              <button
+            <Stack spacing={1} direction="row" alignItems="center">
+              <Button
+                color="success"
+                startIcon={<ReplayIcon />}
                 onClick={() => {
                   // array timestamp used, point.x might have float error
                   // go to 1 second before the click
@@ -160,15 +164,20 @@ function LookAtThisGraph({
                 }}
               >
                 {formatTimestamp(point.x / 1000, videoDuration)}
-              </button>
+              </Button>
 
-              <span>
-                {" "}
+              <Typography
+                color={
+                  point.y === undefined || point.y >= 0 ? "success" : "error"
+                }
+              >
                 {point.y === undefined || point.y >= 0 ? "+" : ""}
-                {point.y}{" "}
-              </span>
+                {point.y}
+              </Typography>
 
-              <button
+              <Button
+                color="error"
+                startIcon={<DeleteIcon />}
                 onClick={() =>
                   deleteClick(
                     appMode,
@@ -180,8 +189,8 @@ function LookAtThisGraph({
                 disabled={appMode === AppMode.Playback}
               >
                 Delete
-              </button>
-            </>
+              </Button>
+            </Stack>
           )
         }}
       />
