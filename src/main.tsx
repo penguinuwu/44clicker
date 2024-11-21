@@ -51,6 +51,7 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           lineHeight: 1,
+          textTransform: "none",
         },
       },
     },
