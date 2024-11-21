@@ -180,3 +180,22 @@ export function formatTimestamp(timestamp: number, maxTime?: number) {
     ? `${m}:${s.padStart(2, "0")}.${ms.padStart(4, "0")}`
     : `${h}:${m.padStart(2, "0")}:${s.padStart(2, "0")}.${ms.padStart(4, "0")}`
 }
+
+/**
+ * validate whether the set keys are valid
+ * @param keyOne
+ * @param keyTwo
+ * @returns boolean
+ */
+export function isValidKeys(keyOne: string, keyTwo: string) {
+  // validate keys unique and single character
+  return (
+    keyOne !== undefined &&
+    keyOne !== null &&
+    keyTwo !== undefined &&
+    keyTwo !== null &&
+    keyOne !== keyTwo &&
+    /^.{1}$/.test(keyOne) &&
+    /^.{1}$/.test(keyTwo)
+  )
+}

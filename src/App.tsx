@@ -31,13 +31,25 @@ import { ScoreJson } from "$/types"
 import { importScoreJson, importScoresFromFile } from "$/userInputHandler"
 import {
   getScoresPerSecond,
+  isValidKeys,
   regainClickerFocus,
   youtubeVideoIdToUrl,
 } from "$/utils"
 
+// init scores database
 const db = init<ScoreJson>({
   appId: atob(`${import.meta.env.VITE_THE_CAT}`),
 })
+
+// get keys from localstorage
+let initialKeyPositive = localStorage.getItem(StorageKey.KeyPositive) || "1"
+let initialKeyNegative = localStorage.getItem(StorageKey.KeyNegative) || "0"
+if (!isValidKeys(initialKeyPositive, initialKeyNegative)) {
+  initialKeyPositive = "1"
+  initialKeyNegative = "0"
+  localStorage.setItem(StorageKey.KeyPositive, "1")
+  localStorage.setItem(StorageKey.KeyNegative, "0")
+}
 
 function App() {
   // web app mode
@@ -84,17 +96,11 @@ function App() {
   const fileUploadElement = useRef<HTMLInputElement | null>(null)
 
   // user input fields
-  const [keyPositive, setKeyPositive] = useState(() => {
-    const localData = localStorage.getItem(StorageKey.KeyPositive)
-    return localData ? JSON.parse(localData) : "a"
-  })
-  const [keyNegative, setKeyNegative] = useState(() => {
-    const localData = localStorage.getItem(StorageKey.KeyNegative)
-    return localData ? JSON.parse(localData) : "s"
-  })
-  const [judgeName, setJudgeName] = useState(() => {
-    const localData = localStorage.getItem(StorageKey.JudgeName)
-    return localData ? JSON.parse(localData) : ""
+  const [keyPositive, setKeyPositive] = useState(initialKeyPositive)
+  const [keyNegative, setKeyNegative] = useState<string>(initialKeyNegative)
+  const [judgeName, setJudgeName] = useState<string>(() => {
+    const initialJudgeName = localStorage.getItem(StorageKey.JudgeName) || ""
+    return `${initialJudgeName}`.substring(0, JUDGE_NAME_LIMIT)
   })
 
   // parse url query parameters for video replay
@@ -221,7 +227,7 @@ function App() {
 
   return (
     <>
-      {/* HeaderBar */}
+      {/* header */}
       <HeaderBar
         {...{
           db,
@@ -390,7 +396,14 @@ function App() {
                     variant="outlined"
                     type="text"
                     value={keyNegative}
-                    onChange={(e) => setKeyNegative(e.target.value)}
+                    onChange={(e) => {
+                      setKeyNegative(e.target.value)
+                      localStorage.setItem(
+                        StorageKey.KeyNegative,
+                        e.target.value,
+                      )
+                    }}
+                    error={!isValidKeys(keyPositive, keyNegative)}
                     slotProps={{ htmlInput: { minLength: 1, maxLength: 1 } }}
                     required
                     sx={{ width: "50%" }}
@@ -416,8 +429,15 @@ function App() {
                     variant="outlined"
                     type="text"
                     value={keyPositive}
-                    onChange={(e) => setKeyPositive(e.target.value)}
-                    slotProps={{ htmlInput: { maxLength: JUDGE_NAME_LIMIT } }}
+                    onChange={(e) => {
+                      setKeyPositive(e.target.value)
+                      localStorage.setItem(
+                        StorageKey.KeyPositive,
+                        e.target.value,
+                      )
+                    }}
+                    error={!isValidKeys(keyPositive, keyNegative)}
+                    slotProps={{ htmlInput: { minLength: 1, maxLength: 1 } }}
                     required
                     sx={{ width: "50%" }}
                     helperText="Shortcut to score +1"
