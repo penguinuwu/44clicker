@@ -13,8 +13,9 @@ function FooterBar() {
         padding={5}
         spacing={0.5}
         direction="row"
-        justifyContent="start"
+        justifyContent="center"
         alignItems="center"
+        sx={{ flexWrap: "wrap" }}
       >
         <Link
           display="flex"

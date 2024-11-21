@@ -409,6 +409,7 @@ function App() {
                     error={!isValidKeys(keyPositive, keyNegative)}
                     slotProps={{ htmlInput: { minLength: 1, maxLength: 1 } }}
                     required
+                    disabled={appMode !== AppMode.Scoring}
                     sx={{ width: "50%" }}
                     helperText="Shortcut to score -1"
                   />
@@ -442,6 +443,7 @@ function App() {
                     error={!isValidKeys(keyPositive, keyNegative)}
                     slotProps={{ htmlInput: { minLength: 1, maxLength: 1 } }}
                     required
+                    disabled={appMode !== AppMode.Scoring}
                     sx={{ width: "50%" }}
                     helperText="Shortcut to score +1"
                   />

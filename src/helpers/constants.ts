@@ -33,13 +33,14 @@ export const INTERVAL_DELAY_THRESHOLD = 0.05
 
 export const KEYFRAMES_POSITIVE = {
   easing: "ease-out",
-  boxShadow: ["0 0 4em 2em darkgreen", "none"],
+  boxShadow: ["inset 0 0 0.1em 0.5em green", "none"],
 }
 export const KEYFRAMES_NEGATIVE = {
   easing: "ease-out",
-  boxShadow: ["0 0 4em 2em crimson", "none"],
+  boxShadow: ["inset 0 0 0.1em 0.5em red", "none"],
 }
 export const ANIME_OPTIONS = {
-  duration: 800,
+  duration: 500,
   iterations: 1,
+  pseudoElement: "::before",
 }

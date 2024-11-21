@@ -1,3 +1,18 @@
 body {
   margin: 0;
 }
+
+#youtube-player {
+  /* https://stackoverflow.com/a/14327156 */
+  /* works with position:absolute in #youtube-player::before */
+  position: relative;
+}
+#youtube-player::before {
+  /* https://stackoverflow.com/a/25474330 */
+  /* works with position:relative in #youtube-player */
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  z-index: 1;
+}
