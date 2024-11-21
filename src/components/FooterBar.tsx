@@ -1,3 +1,4 @@
+import FavoriteIcon from "@mui/icons-material/Favorite"
 import GitHubIcon from "@mui/icons-material/GitHub"
 import InstagramIcon from "@mui/icons-material/Instagram"
 import Divider from "@mui/material/Divider"
@@ -8,23 +9,38 @@ import Typography from "@mui/material/Typography"
 
 function FooterBar() {
   return (
-    <Paper elevation={4} sx={{ borderRadius: 0 }}>
+    <Paper elevation={4} sx={{ borderRadius: 0, color: "rgba(0, 0, 0, " }}>
       <Stack
-        padding={5}
+        paddingTop={5}
+        paddingBottom={1}
+        paddingX={1}
         spacing={0.5}
         direction="row"
         justifyContent="center"
         alignItems="center"
         sx={{ flexWrap: "wrap" }}
       >
+        <Typography>Any issues? Let us know on</Typography>
         <Link
           display="flex"
           alignItems="center"
           href="https://github.com/penguinuwu/44clicker"
         >
-          <GitHubIcon fontSize="inherit" />
+          <GitHubIcon fontSize="inherit" sx={{ marginRight: 0.3 }} />
+          Github!
         </Link>
-        <Divider orientation="vertical" flexItem />
+      </Stack>
+      <Divider variant="middle" flexItem />
+      <Stack
+        paddingTop={1}
+        paddingBottom={5}
+        paddingX={1}
+        spacing={0.5}
+        direction="row"
+        justifyContent="center"
+        alignItems="center"
+        sx={{ flexWrap: "wrap" }}
+      >
         <Typography>Made by</Typography>
         <Link
           display="flex"
@@ -43,6 +59,7 @@ function FooterBar() {
           <InstagramIcon fontSize="inherit" sx={{ marginRight: 0.3 }} />
           Yibo Xu
         </Link>
+        <Typography>:]</Typography>
       </Stack>
     </Paper>
   )
