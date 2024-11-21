@@ -1,33 +1,19 @@
 import { init } from "@instantdb/react"
-import CloudUploadIcon from "@mui/icons-material/CloudUpload"
 import DeleteIcon from "@mui/icons-material/Delete"
-import FileDownloadIcon from "@mui/icons-material/FileDownload"
-import FileUploadIcon from "@mui/icons-material/FileUpload"
-import GitHubIcon from "@mui/icons-material/GitHub"
-import InstagramIcon from "@mui/icons-material/Instagram"
 import ReplayIcon from "@mui/icons-material/Replay"
-import SearchIcon from "@mui/icons-material/Search"
-import AppBar from "@mui/material/AppBar"
-import Badge from "@mui/material/Badge"
 import Button from "@mui/material/Button"
 import Card from "@mui/material/Card"
 import CardContent from "@mui/material/CardContent"
 import CardMedia from "@mui/material/CardMedia"
-import Divider from "@mui/material/Divider"
 import Grid2 from "@mui/material/Grid2"
-import Icon from "@mui/material/Icon"
-import IconButton from "@mui/material/IconButton"
-import InputAdornment from "@mui/material/InputAdornment"
-import Link from "@mui/material/Link"
-import Paper from "@mui/material/Paper"
 import Stack from "@mui/material/Stack"
 import TextField from "@mui/material/TextField"
-import Toolbar from "@mui/material/Toolbar"
 import Typography from "@mui/material/Typography"
 import { useEffect, useRef, useState } from "react"
 import YouTubePlayer from "react-player/youtube"
 
-import LogoSvg from "./assets/logo.svg"
+import FooterBar from "./components/FooterBar"
+import HeaderBar from "./components/HeaderBar"
 import {
   AppMode,
   INTERVAL_DELAY,
@@ -42,13 +28,7 @@ import {
   resetScoreMap,
 } from "./scoringHandler"
 import { ScoreJson } from "./types"
-import {
-  changeVideo,
-  downloadScores,
-  importScoreJson,
-  importScoresFromFile,
-  publishScores,
-} from "./userInputHandler"
+import { importScoreJson, importScoresFromFile } from "./userInputHandler"
 import {
   getScoresPerSecond,
   regainClickerFocus,
@@ -241,125 +221,23 @@ function App() {
 
   return (
     <>
-      {/* navbar */}
-      <AppBar position="fixed" enableColorOnDark>
-        <Toolbar sx={{ justifyContent: "space-between" }}>
-          <Stack spacing={2} alignItems="center" direction="row">
-            <Icon component="a" href="#" sx={{ height: "2em", width: "2em" }}>
-              <img src={LogoSvg} style={{ height: "100%", width: "100%" }} />
-            </Icon>
-            <Badge badgeContent="Beta" color="secondary">
-              <Typography
-                variant="h6"
-                component="a"
-                href="#"
-                noWrap
-                sx={{
-                  mr: 1,
-                  fontFamily: "monospace",
-                  fontWeight: 700,
-                  letterSpacing: ".13rem",
-                  color: "inherit",
-                  textDecoration: "none",
-                }}
-              >
-                44Clicker
-              </Typography>
-            </Badge>
-          </Stack>
-
-          <TextField
-            id="video-id"
-            label="YouTube Video Link"
-            type="text"
-            value={videoUrl}
-            onChange={(e) => setVideoUrl(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                changeVideo(
-                  videoUrl,
-                  videoId,
-                  setScoreMap,
-                  setVideoUrl,
-                  setVideoReady,
-                  setVideoId,
-                )
-                regainClickerFocus(appMode)
-              }
-            }}
-            sx={{ width: "40%" }}
-            required
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <IconButton
-                      edge="start"
-                      onClick={() => {
-                        changeVideo(
-                          videoUrl,
-                          videoId,
-                          setScoreMap,
-                          setVideoUrl,
-                          setVideoReady,
-                          setVideoId,
-                        )
-                        regainClickerFocus(appMode)
-                      }}
-                    >
-                      <SearchIcon />
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-
-          <Stack spacing={1} alignItems="stretch" direction="row">
-            <Button
-              id="import-scores"
-              name="import-scores"
-              startIcon={<FileUploadIcon />}
-              onClick={() => fileUploadElement.current?.click()}
-              disabled={appMode !== AppMode.Scoring}
-            >
-              Import
-              <br />
-              Scores
-            </Button>
-            <Button
-              id="download-scores"
-              name="download-scores"
-              startIcon={<FileDownloadIcon />}
-              onClick={() =>
-                downloadScores(
-                  filesDownloadElement,
-                  videoId,
-                  judgeName,
-                  scoreMap,
-                )
-              }
-              disabled={scoreMap.size <= 0}
-            >
-              Download
-              <br />
-              Scores
-            </Button>
-            <Button
-              id="publish-scores"
-              name="publish-scores"
-              startIcon={<CloudUploadIcon />}
-              onClick={() => publishScores(db, videoId, judgeName, scoreMap)}
-              disabled={appMode !== AppMode.Scoring || scoreMap.size <= 0}
-            >
-              Publish
-              <br />
-              Scores
-            </Button>
-          </Stack>
-        </Toolbar>
-      </AppBar>
-      <Toolbar /> {/* https://stackoverflow.com/a/63300755 */}
+      {/* HeaderBar */}
+      <HeaderBar
+        {...{
+          db,
+          appMode,
+          judgeName,
+          videoId,
+          setVideoId,
+          videoUrl,
+          setVideoUrl,
+          scoreMap,
+          setScoreMap,
+          setVideoReady,
+          fileUploadElement,
+          filesDownloadElement,
+        }}
+      />
       {/* content */}
       <Stack
         sx={{
@@ -602,42 +480,7 @@ function App() {
         </Card>
       </Stack>
       {/* footer */}
-      <Paper elevation={4} sx={{ borderRadius: 0 }}>
-        <Stack
-          padding={5}
-          spacing={0.5}
-          direction="row"
-          justifyContent="start"
-          alignItems="center"
-        >
-          <Link
-            display="flex"
-            alignItems="center"
-            href="https://github.com/penguinuwu/44clicker"
-          >
-            <GitHubIcon fontSize="inherit" />
-          </Link>
-          <Divider orientation="vertical" flexItem />
-          <Typography>Made by</Typography>
-          <Link
-            display="flex"
-            alignItems="center"
-            href="https://www.instagram.com/walk_the_chiken/"
-          >
-            <InstagramIcon fontSize="inherit" sx={{ marginRight: 0.3 }} />
-            Evan Cui
-          </Link>
-          <Typography>and</Typography>
-          <Link
-            display="flex"
-            alignItems="center"
-            href="https://www.instagram.com/0_tacgibrm/"
-          >
-            <InstagramIcon fontSize="inherit" sx={{ marginRight: 0.3 }} />
-            Yibo Xu
-          </Link>
-        </Stack>
-      </Paper>
+      <FooterBar />
       {/* elements to trigger file download */}
       <a
         ref={filesDownloadElement}
