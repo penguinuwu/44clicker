@@ -1,7 +1,7 @@
 import YouTubePlayer from "react-player/youtube"
 
-import { INTERVAL_DELAY_THRESHOLD, PlayerStates } from "$/constants"
-import { clickerFlash } from "$/scoringHandler"
+import { clickerFlash } from "$/handlers/scoringHandler"
+import { INTERVAL_DELAY_THRESHOLD, PlayerStates } from "$/helpers/constants"
 
 /**
  * generate replay function for setInterval

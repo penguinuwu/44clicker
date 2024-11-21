@@ -14,27 +14,30 @@ import YouTubePlayer from "react-player/youtube"
 
 import FooterBar from "$/components/FooterBar"
 import HeaderBar from "$/components/HeaderBar"
+import LookAtThisGraph from "$/graf/LookAtThisGraph"
+import { generateReplayFunction } from "$/handlers/replayHandler"
+import {
+  addClick,
+  generateClickListener,
+  resetScoreMap,
+} from "$/handlers/scoringHandler"
+import {
+  importScoreJson,
+  importScoresFromFile,
+} from "$/handlers/userInputHandler"
 import {
   AppMode,
   INTERVAL_DELAY,
   JUDGE_NAME_LIMIT,
   StorageKey,
-} from "$/constants"
-import LookAtThisGraph from "$/graf/LookAtThisGraph"
-import { generateReplayFunction } from "$/replayHandler"
-import {
-  addClick,
-  generateClickListener,
-  resetScoreMap,
-} from "$/scoringHandler"
-import { ScoreJson } from "$/types"
-import { importScoreJson, importScoresFromFile } from "$/userInputHandler"
+} from "$/helpers/constants"
+import { ScoreJson } from "$/helpers/types"
 import {
   getScoresPerSecond,
   isValidKeys,
   regainClickerFocus,
   youtubeVideoIdToUrl,
-} from "$/utils"
+} from "$/helpers/utils"
 
 // init scores database
 const db = init<ScoreJson>({

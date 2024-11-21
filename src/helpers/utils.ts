@@ -1,5 +1,5 @@
-import { AppMode, JUDGE_NAME_LIMIT } from "$/constants"
-import { ScoreJson } from "$/types"
+import { AppMode, JUDGE_NAME_LIMIT } from "$/helpers/constants"
+import { ScoreJson } from "$/helpers/types"
 
 /**
  * cross origin iframe does not allow key logging!
