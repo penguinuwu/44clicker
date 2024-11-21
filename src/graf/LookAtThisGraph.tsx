@@ -9,10 +9,10 @@ import HighchartsReact from "highcharts-react-official"
 import { useCallback, useState } from "react"
 import YouTubePlayer from "react-player/youtube"
 
-import { AppMode } from "../constants"
-import { deleteClick } from "../scoringHandler"
-import { formatTimestamp } from "../utils"
-import MyToolTip from "./MyToolTip"
+import { AppMode } from "$/constants"
+import MyToolTip from "$/graf/MyToolTip"
+import { deleteClick } from "$/scoringHandler"
+import { formatTimestamp } from "$/utils"
 
 interface Props {
   appMode: AppMode

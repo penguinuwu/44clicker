@@ -5,9 +5,9 @@ import {
   AppMode,
   KEYFRAMES_NEGATIVE,
   KEYFRAMES_POSITIVE,
-} from "./constants"
-import { ScoreJson } from "./types"
-import { sortMapByKey } from "./utils"
+} from "$/constants"
+import { ScoreJson } from "$/types"
+import { sortMapByKey } from "$/utils"
 
 /**
  * flash video on click

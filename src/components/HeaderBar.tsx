@@ -14,11 +14,11 @@ import TextField from "@mui/material/TextField"
 import Toolbar from "@mui/material/Toolbar"
 import Typography from "@mui/material/Typography"
 
-import LogoSvg from "../assets/logo.svg"
-import { AppMode } from "../constants"
-import { ScoreJson } from "../types"
-import { changeVideo, downloadScores, publishScores } from "../userInputHandler"
-import { regainClickerFocus } from "../utils"
+import LogoSvg from "$/assets/logo.svg"
+import { AppMode } from "$/constants"
+import { ScoreJson } from "$/types"
+import { changeVideo, downloadScores, publishScores } from "$/userInputHandler"
+import { regainClickerFocus } from "$/utils"
 
 interface Props {
   db: InstantReactWeb<ScoreJson, {}, false>

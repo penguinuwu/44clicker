@@ -12,28 +12,28 @@ import Typography from "@mui/material/Typography"
 import { useEffect, useRef, useState } from "react"
 import YouTubePlayer from "react-player/youtube"
 
-import FooterBar from "./components/FooterBar"
-import HeaderBar from "./components/HeaderBar"
+import FooterBar from "$/components/FooterBar"
+import HeaderBar from "$/components/HeaderBar"
 import {
   AppMode,
   INTERVAL_DELAY,
   JUDGE_NAME_LIMIT,
   StorageKey,
-} from "./constants"
-import LookAtThisGraph from "./graf/LookAtThisGraph"
-import { generateReplayFunction } from "./replayHandler"
+} from "$/constants"
+import LookAtThisGraph from "$/graf/LookAtThisGraph"
+import { generateReplayFunction } from "$/replayHandler"
 import {
   addClick,
   generateClickListener,
   resetScoreMap,
-} from "./scoringHandler"
-import { ScoreJson } from "./types"
-import { importScoreJson, importScoresFromFile } from "./userInputHandler"
+} from "$/scoringHandler"
+import { ScoreJson } from "$/types"
+import { importScoreJson, importScoresFromFile } from "$/userInputHandler"
 import {
   getScoresPerSecond,
   regainClickerFocus,
   youtubeVideoIdToUrl,
-} from "./utils"
+} from "$/utils"
 
 const db = init<ScoreJson>({
   appId: atob(`${import.meta.env.VITE_THE_CAT}`),

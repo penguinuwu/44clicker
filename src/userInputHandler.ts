@@ -1,9 +1,9 @@
 import { id, InstantReactWeb, tx } from "@instantdb/react"
 
-import { JUDGE_NAME_LIMIT } from "./constants"
-import { importScoreMap, resetScoreMap } from "./scoringHandler"
-import { ScoreJson } from "./types"
-import { getScoreJson, youtubeVideoIdToUrl } from "./utils"
+import { JUDGE_NAME_LIMIT } from "$/constants"
+import { importScoreMap, resetScoreMap } from "$/scoringHandler"
+import { ScoreJson } from "$/types"
+import { getScoreJson, youtubeVideoIdToUrl } from "$/utils"
 
 /**
  * validate input video url, show confirm popup, set video url
