@@ -100,7 +100,7 @@ const theme = createTheme({
     MuiGrid2: {
       defaultProps: {
         container: true,
-        spacing: 3,
+        spacing: { xs: 1, sm: 2, md: 3 },
         alignItems: "stretch",
         justifyContent: "space-evenly",
         flexGrow: 1,

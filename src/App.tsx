@@ -364,7 +364,7 @@ function App() {
       <Stack
         sx={{
           marginY: "2%",
-          marginX: { xs: "2%", md: "5%", lg: "8%", xl: "10%" },
+          marginX: { xs: "2%", md: "5%", lg: "10%", xl: "18%" },
         }}
       >
         <Card>
@@ -516,7 +516,7 @@ function App() {
                     slotProps={{ htmlInput: { minLength: 1, maxLength: 1 } }}
                     required
                     sx={{ width: "50%" }}
-                    helperText="Shortcut key to score -1"
+                    helperText="Shortcut to score -1"
                   />
 
                   <TextField
@@ -542,7 +542,7 @@ function App() {
                     slotProps={{ htmlInput: { maxLength: JUDGE_NAME_LIMIT } }}
                     required
                     sx={{ width: "50%" }}
-                    helperText="Shortcut key to score +1"
+                    helperText="Shortcut to score +1"
                   />
                 </Stack>
               </CardContent>
@@ -553,7 +553,7 @@ function App() {
           <Grid2 size={4}>
             <Card>
               <CardContent>
-                <Stack direction="row">
+                <Stack direction={{ xs: "column", md: "row" }}>
                   <Button
                     id="reset-scores"
                     name="reset-scores"
