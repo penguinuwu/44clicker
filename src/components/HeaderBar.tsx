@@ -17,6 +17,9 @@ import Stack from "@mui/material/Stack"
 import TextField from "@mui/material/TextField"
 import Toolbar from "@mui/material/Toolbar"
 import Typography from "@mui/material/Typography"
+import { useState } from "react"
+import useScrollTrigger from "@mui/material/useScrollTrigger"
+import Slide from "@mui/material/Slide"
 
 import LogoSvg from "$/assets/logo.svg"
 import {
@@ -27,7 +30,6 @@ import {
 import { AppMode } from "$/helpers/constants"
 import { ScoreJson } from "$/helpers/types"
 import { regainClickerFocus } from "$/helpers/utils"
-import { useState } from "react"
 
 interface Props {
   db: InstantReactWeb<ScoreJson, {}, false>
@@ -58,6 +60,9 @@ function HeaderBar({
   fileUploadElement,
   filesDownloadElement,
 }: Props) {
+  // hide bar on scroll
+  const trigger = useScrollTrigger({ disableHysteresis: true, threshold: 30 })
+
   const searchBarVideoId = (
     <TextField
       id="video-id"
@@ -183,68 +188,70 @@ function HeaderBar({
 
   return (
     <>
-      <AppBar position="fixed" enableColorOnDark>
-        <Toolbar sx={{ justifyContent: "space-between" }}>
-          {/* logos */}
-          <Stack spacing={2} alignItems="center" direction="row">
-            <Icon component="a" href="#" sx={{ height: "2em", width: "2em" }}>
-              <img src={LogoSvg} style={{ height: "100%", width: "100%" }} />
-            </Icon>
-            <Badge
-              badgeContent="Beta"
-              color="secondary"
-              sx={{ display: { xs: "none", lg: "inline-flex" } }}
-            >
-              <Typography
-                variant="h6"
-                component="a"
-                href="#"
-                noWrap
-                sx={{
-                  mr: 1,
-                  fontFamily: "monospace",
-                  fontWeight: 700,
-                  letterSpacing: ".13rem",
-                  color: "inherit",
-                  textDecoration: "none",
-                }}
+      <Slide in={!trigger}>
+        <AppBar position="fixed" enableColorOnDark>
+          <Toolbar sx={{ justifyContent: "space-between" }}>
+            {/* logos */}
+            <Stack spacing={2} alignItems="center" direction="row">
+              <Icon component="a" href="#" sx={{ height: "2em", width: "2em" }}>
+                <img src={LogoSvg} style={{ height: "100%", width: "100%" }} />
+              </Icon>
+              <Badge
+                badgeContent="Beta"
+                color="secondary"
+                sx={{ display: { xs: "none", lg: "inline-flex" } }}
               >
-                44Clicker
-              </Typography>
-            </Badge>
-          </Stack>
+                <Typography
+                  variant="h6"
+                  component="a"
+                  href="#"
+                  noWrap
+                  sx={{
+                    mr: 1,
+                    fontFamily: "monospace",
+                    fontWeight: 700,
+                    letterSpacing: ".13rem",
+                    color: "inherit",
+                    textDecoration: "none",
+                  }}
+                >
+                  44Clicker
+                </Typography>
+              </Badge>
+            </Stack>
 
-          {/* search bar */}
-          <Box width={{ xs: "65%", sm: "80%", md: "45%" }}>
-            {searchBarVideoId}
-          </Box>
+            {/* search bar */}
+            <Box width={{ xs: "65%", sm: "80%", md: "45%" }}>
+              {searchBarVideoId}
+            </Box>
 
-          {/* button menu */}
-          <Stack
-            spacing={1}
-            alignItems="stretch"
-            direction="row"
-            display={{ xs: "none", md: "block" }}
-          >
-            {buttonImportScores}
-            {buttonDownloadScores}
-            {buttonPublishScores}
-          </Stack>
+            {/* button menu */}
+            <Stack
+              spacing={1}
+              alignItems="stretch"
+              direction="row"
+              display={{ xs: "none", md: "block" }}
+            >
+              {buttonImportScores}
+              {buttonDownloadScores}
+              {buttonPublishScores}
+            </Stack>
 
-          {/* hidden button menu */}
-          <IconButton
-            size="large"
-            aria-label="show more"
-            aria-controls={mobileMenuId}
-            aria-haspopup="true"
-            onClick={handleMobileMenuOpen}
-            color="inherit"
-            sx={{ display: { md: "none" } }}
-          >
-            <MoreIcon />
-          </IconButton>
-        </Toolbar>
-      </AppBar>
+            {/* hidden button menu */}
+            <IconButton
+              size="large"
+              aria-label="show more"
+              aria-controls={mobileMenuId}
+              aria-haspopup="true"
+              onClick={handleMobileMenuOpen}
+              color="inherit"
+              sx={{ display: { md: "none" } }}
+            >
+              <MoreIcon />
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+      </Slide>
       {mobileMoreMenu}
       <Toolbar /> {/* https://stackoverflow.com/a/63300755 */}
     </>

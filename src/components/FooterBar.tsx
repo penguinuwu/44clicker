@@ -1,4 +1,3 @@
-import FavoriteIcon from "@mui/icons-material/Favorite"
 import GitHubIcon from "@mui/icons-material/GitHub"
 import InstagramIcon from "@mui/icons-material/Instagram"
 import Divider from "@mui/material/Divider"

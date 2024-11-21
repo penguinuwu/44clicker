@@ -106,7 +106,7 @@ function LookAtThisGraph({
               fillColor: {
                 linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
                 stops: [
-                  [0, "#90ee90"],
+                  [0, Highcharts.color("#90ee90").setOpacity(0.5).get("rgba")],
                   [1, Highcharts.color("#90ee90").setOpacity(0).get("rgba")],
                 ],
               },
@@ -114,7 +114,7 @@ function LookAtThisGraph({
                 linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
                 stops: [
                   [0, Highcharts.color("#f08080").setOpacity(0).get("rgba")],
-                  [1, "#f08080"],
+                  [1, Highcharts.color("#f08080").setOpacity(0.5).get("rgba")],
                 ],
               },
               marker: {
