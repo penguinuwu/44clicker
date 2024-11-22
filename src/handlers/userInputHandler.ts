@@ -242,6 +242,7 @@ export async function importScoresFromFile(
  * @param videoId
  * @param judgeName
  * @param scoreMap
+ * @param setPublishUrlResult
  * @returns void
  */
 export async function publishScores(
@@ -249,6 +250,9 @@ export async function publishScores(
   videoId: string,
   judgeName: string,
   scoreMap: Map<number, number>,
+  setPublishUrlResult: React.Dispatch<
+    React.SetStateAction<{ url?: string; status?: string }>
+  >,
 ) {
   console.debug(`publish scores ${videoId}`)
 
@@ -265,21 +269,27 @@ export async function publishScores(
 
   // publish scores
   db.transact(tx.scores[id()].update(scoreJson))
-    .then(() => window.alert(`Score published! Find the score at:\n${url}`))
+    .then(() =>
+      setPublishUrlResult({
+        url,
+        status: "Score published! Find the score at:",
+      }),
+    )
     .catch((e) => {
       console.debug(e)
       if (
         e.message &&
         `${e.message}`.toLowerCase().startsWith("record not unique")
       ) {
-        window.alert(
-          `Error: score has already been published!\n` +
-            `\n` +
-            `Find the score at:\n` +
-            `${url}`,
-        )
+        setPublishUrlResult({
+          url,
+          status: "This score has already been published! Find the score at:",
+        })
       } else {
-        window.alert("Error: score publish failed :[")
+        setPublishUrlResult({
+          url: undefined,
+          status: "Error: score publish failed :[",
+        })
       }
     })
 }

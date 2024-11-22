@@ -22,6 +22,7 @@ import useScrollTrigger from "@mui/material/useScrollTrigger"
 import { useState } from "react"
 
 import LogoSvg from "$/assets/logo.svg"
+import PublishScoresDialog from "$/components/PublishScoresDialog"
 import {
   changeVideo,
   downloadScores,
@@ -42,6 +43,10 @@ interface Props {
   scoreMap: Map<number, number>
   setScoreMap: React.Dispatch<React.SetStateAction<Map<number, number>>>
   setVideoReady: React.Dispatch<React.SetStateAction<boolean>>
+  publishUrlResult: { url?: string; status?: string }
+  setPublishUrlResult: React.Dispatch<
+    React.SetStateAction<{ url?: string; status?: string }>
+  >
   fileUploadElement: React.MutableRefObject<HTMLInputElement | null>
   filesDownloadElement: React.MutableRefObject<HTMLAnchorElement | null>
 }
@@ -57,6 +62,8 @@ function HeaderBar({
   scoreMap,
   setScoreMap,
   setVideoReady,
+  publishUrlResult,
+  setPublishUrlResult,
   fileUploadElement,
   filesDownloadElement,
 }: Props) {
@@ -152,7 +159,7 @@ function HeaderBar({
       variant="contained"
       startIcon={<CloudUploadIcon />}
       onClick={() => {
-        publishScores(db, videoId, judgeName, scoreMap)
+        publishScores(db, videoId, judgeName, scoreMap, setPublishUrlResult)
         handleMobileMenuClose()
       }}
       disabled={appMode !== AppMode.Scoring || scoreMap.size <= 0}
@@ -229,7 +236,11 @@ function HeaderBar({
             </Stack>
 
             {/* search bar */}
-            <Box width={{ xs: "65%", sm: "80%", md: "45%" }}>
+            <Box
+              marginLeft="5%"
+              marginRight={{ xs: "1%", sm: "3%", md: "5%" }}
+              flexGrow={1}
+            >
               {searchBarVideoId}
             </Box>
 
@@ -262,6 +273,7 @@ function HeaderBar({
       </Slide>
       {mobileMoreMenu}
       <Toolbar /> {/* https://stackoverflow.com/a/63300755 */}
+      <PublishScoresDialog {...{ publishUrlResult, setPublishUrlResult }} />
     </>
   )
 }

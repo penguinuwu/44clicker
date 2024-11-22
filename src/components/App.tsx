@@ -94,6 +94,15 @@ function App() {
     Math.max(...displayScoreMapArray.flatMap(([time, _score]) => time)) -
     Math.min(...displayScoreMapArray.flatMap(([time, _score]) => time))
 
+  // upload scores status
+  const [publishUrlResult, setPublishUrlResult] = useState<{
+    url?: string
+    status?: string
+  }>({
+    url: undefined,
+    status: undefined,
+  })
+
   // download/upload fields
   const filesDownloadElement = useRef<HTMLAnchorElement | null>(null)
   const fileUploadElement = useRef<HTMLInputElement | null>(null)
@@ -243,6 +252,8 @@ function App() {
           scoreMap,
           setScoreMap,
           setVideoReady,
+          publishUrlResult,
+          setPublishUrlResult,
           fileUploadElement,
           filesDownloadElement,
         }}
@@ -329,12 +340,13 @@ function App() {
                   <Button
                     id="reset-scores"
                     name="reset-scores"
+                    variant="text"
                     startIcon={<DeleteIcon />}
                     onClick={() => resetScoreMap(setScoreMap, false)}
                     disabled={appMode !== AppMode.Scoring || scoreMap.size <= 0}
                     size="large"
                   >
-                    Reset Scores
+                    Reset
                   </Button>
                   <Button
                     id="app-mode"
@@ -351,7 +363,7 @@ function App() {
                     size="large"
                   >
                     {appMode === AppMode.Scoring
-                      ? "Play Back Scores"
+                      ? "Play Back"
                       : "Stop Play Back"}
                   </Button>
                 </Stack>
@@ -449,7 +461,7 @@ function App() {
           <Grid2 size={4}>
             <Card>
               <CardContent>
-                <Typography variant="subtitle2">Positive Clicks</Typography>
+                <Typography variant="body1">Positive Clicks</Typography>
                 <Typography variant="h5" color="green">
                   {"+ "}
                   {displayScorePositive}
@@ -464,7 +476,7 @@ function App() {
           <Grid2 size={4}>
             <Card>
               <CardContent>
-                <Typography variant="subtitle2">Total Score</Typography>
+                <Typography variant="body1">Total Score</Typography>
                 <Typography variant="h5" color="grey">
                   {displayScoreTotal >= 0 ? "+ " : "- "}
                   {Math.abs(displayScoreTotal)}
@@ -479,7 +491,7 @@ function App() {
           <Grid2 size={4}>
             <Card>
               <CardContent>
-                <Typography variant="subtitle2">Negative Clicks</Typography>
+                <Typography variant="body1">Negative Clicks</Typography>
                 <Typography variant="h5" color="red">
                   {"- "}
                   {/* remove extra "-", we need the hardcoded "-" for "-0" */}
