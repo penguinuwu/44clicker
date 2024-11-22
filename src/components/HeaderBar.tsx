@@ -13,13 +13,13 @@ import IconButton from "@mui/material/IconButton"
 import InputAdornment from "@mui/material/InputAdornment"
 import Menu from "@mui/material/Menu"
 import MenuItem from "@mui/material/MenuItem"
+import Slide from "@mui/material/Slide"
 import Stack from "@mui/material/Stack"
 import TextField from "@mui/material/TextField"
 import Toolbar from "@mui/material/Toolbar"
 import Typography from "@mui/material/Typography"
-import { useState } from "react"
 import useScrollTrigger from "@mui/material/useScrollTrigger"
-import Slide from "@mui/material/Slide"
+import { useState } from "react"
 
 import LogoSvg from "$/assets/logo.svg"
 import {
@@ -116,7 +116,10 @@ function HeaderBar({
       id="import-scores"
       name="import-scores"
       startIcon={<FileUploadIcon />}
-      onClick={() => fileUploadElement.current?.click()}
+      onClick={() => {
+        fileUploadElement.current?.click()
+        handleMobileMenuClose()
+      }}
       disabled={appMode !== AppMode.Scoring}
       sx={{ flexGrow: { xs: 1, md: 0 } }}
     >
@@ -130,9 +133,10 @@ function HeaderBar({
       id="download-scores"
       name="download-scores"
       startIcon={<FileDownloadIcon />}
-      onClick={() =>
+      onClick={() => {
         downloadScores(filesDownloadElement, videoId, judgeName, scoreMap)
-      }
+        handleMobileMenuClose()
+      }}
       disabled={scoreMap.size <= 0}
       sx={{ flexGrow: { xs: 1, md: 0 } }}
     >
@@ -145,8 +149,12 @@ function HeaderBar({
     <Button
       id="publish-scores"
       name="publish-scores"
+      variant="contained"
       startIcon={<CloudUploadIcon />}
-      onClick={() => publishScores(db, videoId, judgeName, scoreMap)}
+      onClick={() => {
+        publishScores(db, videoId, judgeName, scoreMap)
+        handleMobileMenuClose()
+      }}
       disabled={appMode !== AppMode.Scoring || scoreMap.size <= 0}
       sx={{ flexGrow: { xs: 1, md: 0 } }}
     >
@@ -156,7 +164,7 @@ function HeaderBar({
     </Button>
   )
 
-  //
+  // hidden menu for mobile
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
     useState<HTMLElement | null>(null)
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl)
