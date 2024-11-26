@@ -1,12 +1,33 @@
+import FileDownloadIcon from "@mui/icons-material/FileDownload"
+import FileUploadIcon from "@mui/icons-material/FileUpload"
 import GitHubIcon from "@mui/icons-material/GitHub"
 import InstagramIcon from "@mui/icons-material/Instagram"
-import Divider from "@mui/material/Divider"
+import Button from "@mui/material/Button"
 import Link from "@mui/material/Link"
 import Paper from "@mui/material/Paper"
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
 
-function FooterBar() {
+import { downloadScores } from "$/handlers/userInputHandler"
+import { AppMode } from "$/helpers/constants"
+
+interface Props {
+  appMode: AppMode
+  judgeName: string
+  videoId: string
+  scoreMap: Map<number, number>
+  fileUploadElement: React.MutableRefObject<HTMLInputElement | null>
+  filesDownloadElement: React.MutableRefObject<HTMLAnchorElement | null>
+}
+
+function FooterBar({
+  appMode,
+  judgeName,
+  videoId,
+  scoreMap,
+  fileUploadElement,
+  filesDownloadElement,
+}: Props) {
   return (
     <Paper elevation={4} sx={{ borderRadius: 0, color: "rgba(0, 0, 0, " }}>
       <Stack
@@ -29,11 +50,8 @@ function FooterBar() {
           Github!
         </Link>
       </Stack>
-      <Divider variant="middle" flexItem />
       <Stack
-        paddingTop={1}
-        paddingBottom={5}
-        paddingX={1}
+        padding={1}
         spacing={0.5}
         direction="row"
         justifyContent="center"
@@ -59,6 +77,37 @@ function FooterBar() {
           Yibo Xu
         </Link>
         <Typography>:]</Typography>
+      </Stack>
+      <Stack
+        paddingTop={1}
+        paddingBottom={5}
+        paddingX={1}
+        spacing={1}
+        direction="row"
+        justifyContent="center"
+        alignItems="center"
+        sx={{ flexWrap: "wrap" }}
+      >
+        <Button
+          id="import-scores"
+          name="import-scores"
+          startIcon={<FileUploadIcon />}
+          onClick={() => fileUploadElement.current?.click()}
+          disabled={appMode !== AppMode.Scoring}
+        >
+          Import Scores
+        </Button>
+        <Button
+          id="download-scores"
+          name="download-scores"
+          startIcon={<FileDownloadIcon />}
+          onClick={() =>
+            downloadScores(filesDownloadElement, videoId, judgeName, scoreMap)
+          }
+          disabled={scoreMap.size <= 0}
+        >
+          Download Scores
+        </Button>
       </Stack>
     </Paper>
   )

@@ -121,7 +121,7 @@ function App() {
     const params = new URLSearchParams(url.searchParams)
     if (params.has("id")) {
       // reset url
-      window.history.replaceState(null, "", "/")
+      window.history.pushState(null, "", "/")
 
       // get recording id
       const scoreHash = params.get("id")
@@ -254,24 +254,22 @@ function App() {
           setVideoReady,
           publishUrlResult,
           setPublishUrlResult,
-          fileUploadElement,
-          filesDownloadElement,
         }}
       />
       {/* content */}
       <Stack
+        spacing={{ xs: 1, sm: 2, md: 3 }}
         sx={{
-          marginTop: "1%",
-          marginBottom: "2%",
+          marginY: { xs: 1, sm: 2, md: 3 },
           marginX: { xs: "2%", md: "5%", lg: "10%", xl: "18%" },
         }}
       >
         {/* input buttons */}
         <Grid2>
           {/* key bindings */}
-          <Grid2 size={8}>
+          <Grid2 size={{ xs: 12, sm: 8 }}>
             <Card>
-              <CardContent>
+              <CardContent sx={{ flexGrow: 1 }}>
                 <Stack direction="row">
                   <TextField
                     id="key-positive"
@@ -290,13 +288,16 @@ function App() {
                     slotProps={{ htmlInput: { minLength: 1, maxLength: 1 } }}
                     required
                     disabled={appMode !== AppMode.Scoring}
-                    sx={{ width: "50%" }}
+                    sx={{
+                      minWidth: "22%",
+                      display: { xs: "none", md: "inline-block" },
+                    }}
                     helperText="Shortcut to score +1"
                   />
 
                   <TextField
                     id="judge-name"
-                    label="Judge Name (Optional)"
+                    label="Judge Name"
                     variant="outlined"
                     type="text"
                     value={judgeName}
@@ -304,7 +305,7 @@ function App() {
                     slotProps={{ htmlInput: { maxLength: JUDGE_NAME_LIMIT } }}
                     disabled={appMode !== AppMode.Scoring}
                     sx={{ width: "100%" }}
-                    helperText=" "
+                    helperText="Optional name up to 30 characters"
                   />
 
                   <TextField
@@ -324,7 +325,10 @@ function App() {
                     slotProps={{ htmlInput: { minLength: 1, maxLength: 1 } }}
                     required
                     disabled={appMode !== AppMode.Scoring}
-                    sx={{ width: "50%" }}
+                    sx={{
+                      minWidth: "22%",
+                      display: { xs: "none", md: "inline-block" },
+                    }}
                     helperText="Shortcut to score -1"
                   />
                 </Stack>
@@ -333,10 +337,10 @@ function App() {
           </Grid2>
 
           {/* reset / playback */}
-          <Grid2 size={4}>
+          <Grid2 size={{ xs: 12, sm: 4 }}>
             <Card>
               <CardContent>
-                <Stack direction={{ xs: "column", md: "row" }}>
+                <Stack direction={{ xs: "row", sm: "column", md: "row" }}>
                   <Button
                     id="reset-scores"
                     name="reset-scores"
@@ -374,136 +378,180 @@ function App() {
 
         {/* video */}
         <Card>
-          <CardMedia sx={{ display: "flex", alignSelf: "stretch" }}>
-            <Button
-              variant="contained"
-              color="success"
-              sx={{
-                lineHeight: 1.5,
-                borderTopRightRadius: 0,
-                borderBottomRightRadius: 0,
-              }}
-              id="click-positive"
-              onClick={() =>
-                addClick(
-                  appMode,
-                  videoReady,
-                  videoDuration,
-                  youtubePlayer,
-                  setScoreMap,
-                  +1,
-                )
-              }
-              disabled={appMode !== AppMode.Scoring}
-            >
-              +1
-              <br />[{keyPositive}]
-            </Button>
-          </CardMedia>
-          <CardMedia
-            component={YouTubePlayer}
-            id="youtube-player"
-            width="100%"
-            height="100%"
-            sx={{ aspectRatio: 16 / 9 }}
-            url={youtubeVideoIdToUrl(videoId)}
-            controls={true}
-            // onDuration={setVideoDuration} // this seems unreliable
-            onError={window.alert}
-            onReady={() => {
-              setVideoReady(true)
-              setVideoDuration(youtubePlayer.current?.getDuration()!)
-            }}
-            onStart={() => regainClickerFocus(appMode)}
-            onPlay={() => regainClickerFocus(appMode)}
-            onPause={() => regainClickerFocus(appMode)}
-            onBuffer={() => regainClickerFocus(appMode)}
-            onBufferEnd={() => regainClickerFocus(appMode)}
-            onSeek={() => regainClickerFocus(appMode)}
-            onPlaybackRateChange={() => regainClickerFocus(appMode)}
-            onPlaybackQualityChange={() => regainClickerFocus(appMode)}
-            onEnded={() => regainClickerFocus(appMode)}
-            onClickPreview={() => regainClickerFocus(appMode)}
-            onEnablePIP={() => regainClickerFocus(appMode)}
-            onDisablePIP={() => regainClickerFocus(appMode)}
-            ref={youtubePlayer}
-          />
-          <CardMedia sx={{ display: "flex", alignSelf: "stretch" }}>
-            <Button
-              variant="contained"
-              color="error"
-              sx={{
-                lineHeight: 1.5,
-                borderTopLeftRadius: 0,
-                borderBottomLeftRadius: 0,
-              }}
-              id="click-negative"
-              onClick={() =>
-                addClick(
-                  appMode,
-                  videoReady,
-                  videoDuration,
-                  youtubePlayer,
-                  setScoreMap,
-                  -1,
-                )
-              }
-              disabled={appMode !== AppMode.Scoring}
-            >
-              -1
-              <br />[{keyNegative}]
-            </Button>
-          </CardMedia>
+          <Stack spacing={0} direction="column" flexGrow={1}>
+            <Stack spacing={0} direction="row">
+              <Button
+                variant="contained"
+                color="success"
+                sx={{
+                  borderTopRightRadius: 0,
+                  borderBottomRightRadius: 0,
+                  display: { xs: "none", md: "inline-flex" },
+                }}
+                onClick={() =>
+                  addClick(
+                    appMode,
+                    videoReady,
+                    videoDuration,
+                    youtubePlayer,
+                    setScoreMap,
+                    +1,
+                  )
+                }
+                disabled={appMode !== AppMode.Scoring}
+              >
+                +1
+                <br />[{keyPositive}]
+              </Button>
+              <CardMedia
+                component={YouTubePlayer}
+                id="youtube-player"
+                width="100%"
+                height="100%"
+                sx={{ aspectRatio: 16 / 9 }}
+                url={youtubeVideoIdToUrl(videoId)}
+                controls={true}
+                // onDuration={setVideoDuration} // this seems unreliable
+                onError={window.alert}
+                onReady={() => {
+                  setVideoReady(true)
+                  setVideoDuration(youtubePlayer.current?.getDuration()!)
+                }}
+                onStart={() => regainClickerFocus(appMode)}
+                onPlay={() => regainClickerFocus(appMode)}
+                onPause={() => regainClickerFocus(appMode)}
+                onBuffer={() => regainClickerFocus(appMode)}
+                onBufferEnd={() => regainClickerFocus(appMode)}
+                onSeek={() => regainClickerFocus(appMode)}
+                onPlaybackRateChange={() => regainClickerFocus(appMode)}
+                onPlaybackQualityChange={() => regainClickerFocus(appMode)}
+                onEnded={() => regainClickerFocus(appMode)}
+                onClickPreview={() => regainClickerFocus(appMode)}
+                onEnablePIP={() => regainClickerFocus(appMode)}
+                onDisablePIP={() => regainClickerFocus(appMode)}
+                ref={youtubePlayer}
+              />
+              <Button
+                variant="contained"
+                color="error"
+                sx={{
+                  borderTopLeftRadius: 0,
+                  borderBottomLeftRadius: 0,
+                  display: { xs: "none", md: "inline-flex" },
+                }}
+                onClick={() =>
+                  addClick(
+                    appMode,
+                    videoReady,
+                    videoDuration,
+                    youtubePlayer,
+                    setScoreMap,
+                    -1,
+                  )
+                }
+                disabled={appMode !== AppMode.Scoring}
+              >
+                -1
+                <br />[{keyNegative}]
+              </Button>
+            </Stack>
+            <Stack spacing={0} direction="row" display={{ md: "none" }}>
+              <Button
+                variant="contained"
+                color="success"
+                size="large"
+                sx={{
+                  flexGrow: 1,
+                  borderTopLeftRadius: 0,
+                  borderTopRightRadius: 0,
+                  borderBottomRightRadius: 0,
+                  lineHeight: 2,
+                }}
+                onClick={() =>
+                  addClick(
+                    appMode,
+                    videoReady,
+                    videoDuration,
+                    youtubePlayer,
+                    setScoreMap,
+                    +1,
+                  )
+                }
+                disabled={appMode !== AppMode.Scoring}
+              >
+                +1
+              </Button>
+              <Button
+                variant="contained"
+                color="error"
+                size="large"
+                sx={{
+                  flexGrow: 1,
+                  borderTopRightRadius: 0,
+                  borderTopLeftRadius: 0,
+                  borderBottomLeftRadius: 0,
+                  lineHeight: 2,
+                }}
+                onClick={() =>
+                  addClick(
+                    appMode,
+                    videoReady,
+                    videoDuration,
+                    youtubePlayer,
+                    setScoreMap,
+                    -1,
+                  )
+                }
+                disabled={appMode !== AppMode.Scoring}
+              >
+                -1
+              </Button>
+            </Stack>
+          </Stack>
         </Card>
 
         {/* score counter */}
-        <Grid2>
-          <Grid2 size={4}>
-            <Card>
-              <CardContent>
-                <Typography variant="body1">Positive Clicks</Typography>
-                <Typography variant="h5" color="green">
-                  {"+ "}
-                  {displayScorePositive}
-                </Typography>
-                <Typography variant="caption">
-                  {getScoresPerSecond(displayScorePositive, displayTotalTime)}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid2>
+        <Stack direction={{ xs: "column", sm: "row" }}>
+          <Card>
+            <CardContent>
+              <Typography variant="body1">Positive Clicks</Typography>
+              <Typography variant="h5" color="green">
+                {"+ "}
+                {displayScorePositive}
+              </Typography>
+              <Typography variant="caption">
+                {getScoresPerSecond(displayScorePositive, displayTotalTime)}
+              </Typography>
+            </CardContent>
+          </Card>
 
-          <Grid2 size={4}>
-            <Card>
-              <CardContent>
-                <Typography variant="body1">Total Score</Typography>
-                <Typography variant="h5" color="grey">
-                  {displayScoreTotal >= 0 ? "+ " : "- "}
-                  {Math.abs(displayScoreTotal)}
-                </Typography>
-                <Typography variant="caption">
-                  {getScoresPerSecond(displayScoreTotal, displayTotalTime)}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid2>
+          <Card>
+            <CardContent>
+              <Typography variant="body1">Total Score</Typography>
+              <Typography variant="h5" color="grey">
+                {displayScoreTotal >= 0 ? "+ " : "- "}
+                {Math.abs(displayScoreTotal)}
+              </Typography>
+              <Typography variant="caption">
+                {getScoresPerSecond(displayScoreTotal, displayTotalTime)}
+              </Typography>
+            </CardContent>
+          </Card>
 
-          <Grid2 size={4}>
-            <Card>
-              <CardContent>
-                <Typography variant="body1">Negative Clicks</Typography>
-                <Typography variant="h5" color="red">
-                  {"- "}
-                  {/* remove extra "-", we need the hardcoded "-" for "-0" */}
-                  {displayScoreNegative * -1}
-                </Typography>
-                <Typography variant="caption">
-                  {getScoresPerSecond(displayScoreNegative, displayTotalTime)}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid2>
-        </Grid2>
+          <Card>
+            <CardContent>
+              <Typography variant="body1">Negative Clicks</Typography>
+              <Typography variant="h5" color="red">
+                {"- "}
+                {/* remove extra "-", we need the hardcoded "-" for "-0" */}
+                {displayScoreNegative * -1}
+              </Typography>
+              <Typography variant="caption">
+                {getScoresPerSecond(displayScoreNegative, displayTotalTime)}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Stack>
 
         {/* graph */}
         <Card>
@@ -519,7 +567,16 @@ function App() {
         </Card>
       </Stack>
       {/* footer */}
-      <FooterBar />
+      <FooterBar
+        {...{
+          appMode,
+          judgeName,
+          videoId,
+          scoreMap,
+          fileUploadElement,
+          filesDownloadElement,
+        }}
+      />
       {/* elements to trigger file download */}
       <a
         ref={filesDownloadElement}

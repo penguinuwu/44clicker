@@ -1,8 +1,5 @@
 import { InstantReactWeb } from "@instantdb/react"
 import CloudUploadIcon from "@mui/icons-material/CloudUpload"
-import FileDownloadIcon from "@mui/icons-material/FileDownload"
-import FileUploadIcon from "@mui/icons-material/FileUpload"
-import MoreIcon from "@mui/icons-material/MoreVert"
 import SearchIcon from "@mui/icons-material/Search"
 import AppBar from "@mui/material/AppBar"
 import Badge from "@mui/material/Badge"
@@ -23,11 +20,7 @@ import { useState } from "react"
 
 import LogoSvg from "$/assets/logo.svg"
 import PublishScoresDialog from "$/components/PublishScoresDialog"
-import {
-  changeVideo,
-  downloadScores,
-  publishScores,
-} from "$/handlers/userInputHandler"
+import { changeVideo, publishScores } from "$/handlers/userInputHandler"
 import { AppMode } from "$/helpers/constants"
 import { ScoreJson } from "$/helpers/types"
 import { regainClickerFocus } from "$/helpers/utils"
@@ -47,8 +40,6 @@ interface Props {
   setPublishUrlResult: React.Dispatch<
     React.SetStateAction<{ url?: string; status?: string }>
   >
-  fileUploadElement: React.MutableRefObject<HTMLInputElement | null>
-  filesDownloadElement: React.MutableRefObject<HTMLAnchorElement | null>
 }
 
 function HeaderBar({
@@ -64,8 +55,6 @@ function HeaderBar({
   setVideoReady,
   publishUrlResult,
   setPublishUrlResult,
-  fileUploadElement,
-  filesDownloadElement,
 }: Props) {
   // hide bar on scroll
   const trigger = useScrollTrigger({ disableHysteresis: true, threshold: 30 })
@@ -118,40 +107,6 @@ function HeaderBar({
       }}
     />
   )
-  const buttonImportScores = (
-    <Button
-      id="import-scores"
-      name="import-scores"
-      startIcon={<FileUploadIcon />}
-      onClick={() => {
-        fileUploadElement.current?.click()
-        handleMobileMenuClose()
-      }}
-      disabled={appMode !== AppMode.Scoring}
-      sx={{ flexGrow: { xs: 1, md: 0 } }}
-    >
-      Import
-      <br />
-      Scores
-    </Button>
-  )
-  const buttonDownloadScores = (
-    <Button
-      id="download-scores"
-      name="download-scores"
-      startIcon={<FileDownloadIcon />}
-      onClick={() => {
-        downloadScores(filesDownloadElement, videoId, judgeName, scoreMap)
-        handleMobileMenuClose()
-      }}
-      disabled={scoreMap.size <= 0}
-      sx={{ flexGrow: { xs: 1, md: 0 } }}
-    >
-      Download
-      <br />
-      Scores
-    </Button>
-  )
   const buttonPublishScores = (
     <Button
       id="publish-scores"
@@ -165,9 +120,7 @@ function HeaderBar({
       disabled={appMode !== AppMode.Scoring || scoreMap.size <= 0}
       sx={{ flexGrow: { xs: 1, md: 0 } }}
     >
-      Publish
-      <br />
-      Scores
+      Publish Scores
     </Button>
   )
 
@@ -195,8 +148,6 @@ function HeaderBar({
       <MenuItem divider={true} disabled={true}>
         <Typography>Score Options</Typography>
       </MenuItem>
-      <MenuItem divider={true}>{buttonImportScores}</MenuItem>
-      <MenuItem divider={true}>{buttonDownloadScores}</MenuItem>
       <MenuItem>{buttonPublishScores}</MenuItem>
     </Menu>
   )
@@ -204,7 +155,7 @@ function HeaderBar({
   return (
     <>
       <Slide in={!trigger}>
-        <AppBar position="fixed" enableColorOnDark>
+        <AppBar position="fixed">
           <Toolbar sx={{ justifyContent: "space-between" }}>
             {/* logos */}
             <Stack spacing={2} alignItems="center" direction="row">
@@ -214,6 +165,7 @@ function HeaderBar({
               <Badge
                 badgeContent="Beta"
                 color="secondary"
+                // sx={{ visibility: { xs: "collapse", lg: "visible" } }}
                 sx={{ display: { xs: "none", lg: "inline-flex" } }}
               >
                 <Typography
@@ -249,10 +201,8 @@ function HeaderBar({
               spacing={1}
               alignItems="stretch"
               direction="row"
-              display={{ xs: "none", md: "block" }}
+              visibility={{ xs: "collapse", md: "visible" }}
             >
-              {buttonImportScores}
-              {buttonDownloadScores}
               {buttonPublishScores}
             </Stack>
 
@@ -264,9 +214,9 @@ function HeaderBar({
               aria-haspopup="true"
               onClick={handleMobileMenuOpen}
               color="inherit"
-              sx={{ display: { md: "none" } }}
+              sx={{ visibility: { md: "collapse" } }}
             >
-              <MoreIcon />
+              <CloudUploadIcon />
             </IconButton>
           </Toolbar>
         </AppBar>

@@ -8,11 +8,9 @@ import "$/index.css"
 
 const paletteLight = {
   main: "#fff",
-  contrastText: "#000",
 }
 const paletteDark = {
-  main: "#121212",
-  contrastText: "#fff",
+  main: "#262626",
 }
 
 const theme = createTheme({
@@ -23,8 +21,7 @@ const theme = createTheme({
         primary: paletteLight,
         secondary: paletteDark,
         background: {
-          default: paletteLight.main,
-          paper: paletteLight.main,
+          default: "#f0f0f0",
         },
       },
     },
@@ -33,8 +30,7 @@ const theme = createTheme({
         primary: paletteDark,
         secondary: paletteLight,
         background: {
-          default: paletteDark.main,
-          paper: paletteDark.main,
+          default: "#121212",
         },
       },
     },
@@ -50,7 +46,6 @@ const theme = createTheme({
       },
       styleOverrides: {
         root: {
-          lineHeight: 1,
           textTransform: "none",
         },
       },
@@ -109,7 +104,7 @@ const theme = createTheme({
     },
     MuiStack: {
       defaultProps: {
-        spacing: 2,
+        spacing: { xs: 1, sm: 2, md: 3 },
         alignItems: "stretch",
         justifyContent: "center",
       },
