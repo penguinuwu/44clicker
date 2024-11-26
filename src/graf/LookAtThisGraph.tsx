@@ -137,8 +137,6 @@ function LookAtThisGraph({
             animation: true,
             hideDelay: 100,
             stickOnContact: true,
-            // outside: true,
-            // followPointer: true,
           },
         }}
         callback={callback}
@@ -150,7 +148,16 @@ function LookAtThisGraph({
         youtubePlayer={youtubePlayer}
         children={({ point }) => {
           return (
-            <Stack spacing={1} direction="row" alignItems="center">
+            <Stack
+              spacing={1}
+              direction="row"
+              alignItems="center"
+              onTouchStartCapture={(e) => {
+                // prevent mobile button clicks from activating other tooltips
+                e.stopPropagation()
+                e.nativeEvent.stopImmediatePropagation()
+              }}
+            >
               <Button
                 color="success"
                 startIcon={<ReplayIcon />}

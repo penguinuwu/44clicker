@@ -1,8 +1,4 @@
-import {
-  Chart,
-  TooltipFormatterCallbackFunction,
-  TooltipFormatterContextObject,
-} from "highcharts"
+import { Chart, TooltipFormatterContextObject } from "highcharts"
 import { useEffect, useRef, useState } from "react"
 import ReactDOM from "react-dom"
 import YouTubePlayer from "react-player/youtube"
@@ -29,23 +25,21 @@ function MyToolTip({ chart, children }: Props) {
 
   useEffect(() => {
     if (chart) {
-      const formatter: TooltipFormatterCallbackFunction = function () {
-        if (!isInit.current) {
-          isInit.current = true
-
-          chart.tooltip.refresh.apply(chart.tooltip, [this.point])
-          chart.tooltip.hide(0)
-        }
-
-        console.debug(this)
-        setContext(this)
-
-        return `<div id="${generateTooltipId(chart.index)}"></div>`
-      }
-
       chart.update({
         tooltip: {
-          formatter,
+          formatter: function () {
+            if (!isInit.current) {
+              isInit.current = true
+
+              chart.tooltip.refresh.apply(chart.tooltip, [this.point])
+              chart.tooltip.hide(0)
+            }
+
+            console.debug(this)
+            setContext(this)
+
+            return `<div id="${generateTooltipId(chart.index)}"></div>`
+          },
           useHTML: true,
         },
       })
@@ -57,21 +51,24 @@ function MyToolTip({ chart, children }: Props) {
   useEffect(() => {
     if (context) {
       const tooltip: any = context.series.chart.tooltip
-      const textEl = tooltip.label.text.element
 
-      console.debug(textEl.offsetWidth)
-      tooltip.label.box.attr({
-        height: textEl.offsetHeight + 12,
-        width: textEl.offsetWidth + 16,
-      })
+      if (tooltip?.label) {
+        const textEl = tooltip.label.text.element
 
-      tooltip.label.attr({
-        height: 0,
-      })
+        console.debug(textEl.offsetWidth)
+        tooltip.label.box.attr({
+          height: textEl.offsetHeight + 12,
+          width: textEl.offsetWidth + 16,
+        })
 
-      tooltip.label.text.css({
-        top: "8px",
-      })
+        tooltip.label.attr({
+          height: 0,
+        })
+
+        tooltip.label.text.css({
+          top: "8px",
+        })
+      }
     }
   }, [chart, context])
 
