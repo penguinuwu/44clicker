@@ -3,6 +3,7 @@ import FileUploadIcon from "@mui/icons-material/FileUpload"
 import GitHubIcon from "@mui/icons-material/GitHub"
 import InstagramIcon from "@mui/icons-material/Instagram"
 import Button from "@mui/material/Button"
+import Divider from "@mui/material/Divider"
 import Link from "@mui/material/Link"
 import Paper from "@mui/material/Paper"
 import Stack from "@mui/material/Stack"
@@ -29,7 +30,7 @@ function FooterBar({
   filesDownloadElement,
 }: Props) {
   return (
-    <Paper elevation={4} sx={{ borderRadius: 0, color: "rgba(0, 0, 0, " }}>
+    <Paper elevation={4} sx={{ borderRadius: 0 }}>
       <Stack
         paddingTop={5}
         paddingBottom={1}
@@ -97,6 +98,7 @@ function FooterBar({
         >
           Import Scores
         </Button>
+        <Divider orientation="vertical" variant="middle" flexItem />
         <Button
           id="download-scores"
           name="download-scores"

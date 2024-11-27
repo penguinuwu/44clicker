@@ -258,11 +258,8 @@ function App() {
       />
       {/* content */}
       <Stack
-        spacing={{ xs: 1, sm: 2, md: 3 }}
-        sx={{
-          marginY: { xs: 1, sm: 2, md: 3 },
-          marginX: { xs: "2%", md: "5%", lg: "10%", xl: "18%" },
-        }}
+        marginX={{ xs: 2, md: 3, lg: "10%", xl: "18%" }}
+        marginY={{ xs: 2, md: 3 }}
       >
         {/* input buttons */}
         <Grid2>
@@ -292,7 +289,7 @@ function App() {
                       minWidth: "22%",
                       display: { xs: "none", md: "inline-block" },
                     }}
-                    helperText="Shortcut to score +1"
+                    helperText="Shortcut for +1"
                   />
 
                   <TextField
@@ -329,7 +326,7 @@ function App() {
                       minWidth: "22%",
                       display: { xs: "none", md: "inline-block" },
                     }}
-                    helperText="Shortcut to score -1"
+                    helperText="Shortcut for -1"
                   />
                 </Stack>
               </CardContent>

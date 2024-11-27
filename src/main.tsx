@@ -10,7 +10,7 @@ const paletteLight = {
   main: "#fff",
 }
 const paletteDark = {
-  main: "#262626",
+  main: "#282828",
 }
 
 const theme = createTheme({
@@ -30,7 +30,7 @@ const theme = createTheme({
         primary: paletteDark,
         secondary: paletteLight,
         background: {
-          default: "#121212",
+          default: "#000",
         },
       },
     },
@@ -72,6 +72,9 @@ const theme = createTheme({
       },
     },
     MuiCard: {
+      defaultProps: {
+        variant: "outlined",
+      },
       styleOverrides: {
         root: {
           textAlign: "center",

@@ -120,7 +120,7 @@ function HeaderBar({
       disabled={appMode !== AppMode.Scoring || scoreMap.size <= 0}
       sx={{ flexGrow: { xs: 1, md: 0 } }}
     >
-      Publish Scores
+      Upload Scores
     </Button>
   )
 
@@ -165,7 +165,6 @@ function HeaderBar({
               <Badge
                 badgeContent="Beta"
                 color="secondary"
-                // sx={{ visibility: { xs: "collapse", lg: "visible" } }}
                 sx={{ display: { xs: "none", lg: "inline-flex" } }}
               >
                 <Typography
