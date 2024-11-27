@@ -200,7 +200,7 @@ function HeaderBar({
               spacing={1}
               alignItems="stretch"
               direction="row"
-              visibility={{ xs: "collapse", md: "visible" }}
+              display={{ xs: "none", md: "inline-flex" }}
             >
               {buttonPublishScores}
             </Stack>
@@ -213,7 +213,7 @@ function HeaderBar({
               aria-haspopup="true"
               onClick={handleMobileMenuOpen}
               color="inherit"
-              sx={{ visibility: { md: "collapse" } }}
+              sx={{ display: { md: "none" } }}
             >
               <CloudUploadIcon />
             </IconButton>
