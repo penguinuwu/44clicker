@@ -118,7 +118,7 @@ export async function downloadScores(
  * @param setVideoId
  * @param setJudgeName
  * @param scoreJson
- * @returns
+ * @returns whether import succeeded
  */
 export async function importScoreJson(
   currentVideoId: string,
@@ -139,7 +139,7 @@ export async function importScoreJson(
     scoreJson.scores.length <= 0
   ) {
     window.alert("Error: empty scores data!")
-    return
+    return false
   }
 
   // validate each time-click pair
@@ -154,7 +154,7 @@ export async function importScoreJson(
     ) {
       console.debug(pair)
       window.alert("Error: incorrect scores format")
-      return
+      return false
     }
   }
 
@@ -173,13 +173,13 @@ export async function importScoreJson(
     )
   ) {
     window.alert("Error: invalid video link")
-    return
+    return false
   }
 
   setJudgeName(scoreJson.judgeName.substring(0, JUDGE_NAME_LIMIT))
 
   // input is validated
-  importScoreMap(setScoreMap, scoreJson, true)
+  return importScoreMap(setScoreMap, scoreJson, true)
 }
 
 /**

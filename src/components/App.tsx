@@ -11,6 +11,8 @@ import TextField from "@mui/material/TextField"
 import Typography from "@mui/material/Typography"
 import { useEffect, useRef, useState } from "react"
 import YouTubePlayer from "react-player/youtube"
+import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline"
+import PauseCircleOutlinedIcon from "@mui/icons-material/PauseCircleOutlined"
 
 import FooterBar from "$/components/FooterBar"
 import HeaderBar from "$/components/HeaderBar"
@@ -128,18 +130,22 @@ function App() {
       console.debug(scoreHash)
 
       db.queryOnce({ scores: { $: { where: { hash: scoreHash } } } })
-        .then(({ data }) => {
+        .then(async ({ data }) => {
           if (data.scores.length === 1) {
             const scoreJson = data.scores[0] as unknown as ScoreJson
-            importScoreJson(
-              videoId,
-              setScoreMap,
-              setVideoUrl,
-              setVideoReady,
-              setVideoId,
-              setJudgeName,
-              scoreJson,
-            )
+            if (
+              await importScoreJson(
+                videoId,
+                setScoreMap,
+                setVideoUrl,
+                setVideoReady,
+                setVideoId,
+                setJudgeName,
+                scoreJson,
+              )
+            ) {
+              setAppMode(AppMode.Playback)
+            }
           } else {
             window.alert(
               `Error: unable to find score :[\n` + `ID: ${scoreHash}`,
@@ -341,6 +347,7 @@ function App() {
                   <Button
                     id="reset-scores"
                     name="reset-scores"
+                    color="error"
                     variant="text"
                     startIcon={<DeleteIcon />}
                     onClick={() => resetScoreMap(setScoreMap, false)}
@@ -352,7 +359,17 @@ function App() {
                   <Button
                     id="app-mode"
                     name="app-mode"
-                    startIcon={<ReplayIcon />}
+                    startIcon={
+                      appMode === AppMode.Playback ? (
+                        <PauseCircleOutlinedIcon />
+                      ) : (
+                        <PlayCircleOutlineIcon />
+                      )
+                    }
+                    color={appMode === AppMode.Playback ? "error" : "success"}
+                    variant={
+                      appMode === AppMode.Playback ? "contained" : "outlined"
+                    }
                     onClick={() =>
                       appMode === AppMode.Playback
                         ? setAppMode(AppMode.Scoring)
@@ -363,9 +380,9 @@ function App() {
                     }
                     size="large"
                   >
-                    {appMode === AppMode.Scoring
-                      ? "Play Back"
-                      : "Stop Play Back"}
+                    {appMode === AppMode.Playback
+                      ? "Stop Play Back"
+                      : "Play Back"}
                   </Button>
                 </Stack>
               </CardContent>
@@ -410,6 +427,7 @@ function App() {
                 controls={true}
                 // onDuration={setVideoDuration} // this seems unreliable
                 onError={window.alert}
+                playing={appMode === AppMode.Playback}
                 onReady={() => {
                   setVideoReady(true)
                   setVideoDuration(youtubePlayer.current?.getDuration()!)

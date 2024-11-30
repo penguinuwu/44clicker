@@ -184,6 +184,7 @@ export function deleteClick(
  * @param setScoreMap
  * @param scoreJson
  * @param confirmed skip confirmation popup
+ * @returns whether import succeeded
  */
 export function importScoreMap(
   setScoreMap: React.Dispatch<React.SetStateAction<Map<number, number>>>,
@@ -194,7 +195,10 @@ export function importScoreMap(
   if (confirmed || window.confirm("Are you sure you want to import scores?")) {
     // create new map, then sort, then set
     setScoreMap(sortMapByKey(new Map(scoreJson.scores)))
+    return true
   }
+
+  return false
 }
 
 /**

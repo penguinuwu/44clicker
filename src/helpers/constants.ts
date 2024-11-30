@@ -31,13 +31,16 @@ export const INTERVAL_DELAY = 10
 // it's unlikely for users to intentionally seek +/- 50ms
 export const INTERVAL_DELAY_THRESHOLD = 0.05
 
+// box-shadow syntax:
+// <inset> <offset-x> <offset-y> <blur-radius> <spread-radius> <colour>
+// inset: inner box-shadow
 export const KEYFRAMES_POSITIVE = {
   easing: "ease-out",
-  boxShadow: ["inset 0 0 0.1em 0.5em green", "none"],
+  boxShadow: ["inset 0 0 0.2em 0.8em #32cd32", "none"],
 }
 export const KEYFRAMES_NEGATIVE = {
   easing: "ease-out",
-  boxShadow: ["inset 0 0 0.1em 0.5em red", "none"],
+  boxShadow: ["inset 0 0 0.2em 0.8em #ff0000", "none"],
 }
 export const ANIME_OPTIONS = {
   duration: 500,
