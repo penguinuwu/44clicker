@@ -1,50 +1,89 @@
-# React + TypeScript + Vite
+# 44Clicker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React web application for scoring yo-yo routines with real-time visualization and cloud storage.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **YouTube Integration**: Watch and score YouTube videos in real-time
+- **Interactive Scoring**: Use keyboard shortcuts for quick +1/-1 clicks
+- **Data Visualization**: View scores with an interactive [Highcharts](https://highcharts.com/) graph
+- **Score Management**:
+  - Add/delete individual scores
+  - Upload scores to cloud
+  - Export scores to file
+  - Import scores from file
+- **Replay Mode**: Review and analyze scoring patterns
+- **Responsive Design**: Built with [Material UI](https://mui.com/) components, supporting all screen sizes
 
-## Expanding the ESLint configuration
+## Tools Used
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- [React v18](https://react.dev/)
+- [InstantDB](https://instantdb.com/)
+- [Vite](https://vite.dev/)
+- [Highcharts](https://highcharts.com/)
+- [ReactPlayer](https://github.com/cookpete/react-player/)
+- [Material UI](https://mui.com/)
+- [TypeScript](https://typescriptlang.org/)
 
-- Configure the top-level `parserOptions` property like this:
+## Project Structure
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```plaintext
+44clicker/
+├── src/
+│   ├── components/             # React components
+│   │   ├── App.tsx               # Main application component
+│   │   ├── HeaderBar.tsx         # Navigation and main actions
+│   │   ├── FooterBar.tsx         # Footer notes
+│   │   └── PublishDialog.tsx     # Score upload dialog
+│   │
+│   ├── graf/                   # Graph components
+│   │   ├── LookAtThisGraph.tsx   # Main chart component
+│   │   └── MyToolTip.tsx         # Chart hover tooltip
+│   │
+│   ├── handlers/               # Main functionality handlers
+│   │   ├── replayHandler.tsx     # Score replay logic
+│   │   ├── scoringHandler.tsx    # Scoring logic
+│   │   └── userInputHandler.tsx  # User input parsing logic
+│   │
+│   ├── assets/                 # Static assets
+│   └── helpers/                # Utility functions
+│   
+├── main.tsx                    # App entry point
+└── .env.local                  # Environment variables
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+## Getting Started
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+### Prerequisites
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+- [Node.js](https://nodejs.org/)
+- [pnpm](https://pnpm.io/)
+- [InstantDB](https://instantdb.com/)
+
+### Setup and Usage
+
+```sh
+# 1. Clone the repository
+git clone https://github.com/penguinuwu/44clicker.git
+
+# 2. Install dependencies
+pnpm install
+
+# 3. Start development server
+pnpm dev
+
+# 4. Build for production
+pnpm build
 ```
+
+### Environment Variables
+
+Required in `.env.local`:
+
+```sh
+VITE_DB=<InstantDB App ID>
+```
+
+---
+
+Code developed by **Evan Cui** with UI/UX designed by **Bourbon Xu**
