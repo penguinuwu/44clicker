@@ -42,7 +42,7 @@ import {
 
 // init scores database
 const db = init<ScoreJson>({
-  appId: atob(`${import.meta.env.VITE_THE_CAT}`),
+  appId: atob(`${import.meta.env.VITE_DB}`),
 })
 
 // get keys from localstorage

@@ -19,7 +19,7 @@ import useScrollTrigger from "@mui/material/useScrollTrigger"
 import { useState } from "react"
 
 import LogoSvg from "$/assets/logo.svg"
-import PublishScoresDialog from "$/components/PublishScoresDialog"
+import PublishScoresDialog from "$/components/PublishDialog"
 import { changeVideo, publishScores } from "$/handlers/userInputHandler"
 import { AppMode } from "$/helpers/constants"
 import { ScoreJson } from "$/helpers/types"
