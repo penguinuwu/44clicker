@@ -1,6 +1,6 @@
 # 44Clicker
 
-A React web application for scoring yo-yo routines with real-time visualization and cloud storage.
+A React web application for scoring yo-yo freestyles with real-time visualization and cloud storage.
 
 ## Features
 
