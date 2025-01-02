@@ -46,13 +46,13 @@ const db = init<ScoreJson>({
 })
 
 // get keys from localstorage
-let initialKeyPositive = localStorage.getItem(StorageKey.KeyPositive) || "1"
-let initialKeyNegative = localStorage.getItem(StorageKey.KeyNegative) || "0"
+let initialKeyPositive = localStorage.getItem(StorageKey.KeyPositive) || "f"
+let initialKeyNegative = localStorage.getItem(StorageKey.KeyNegative) || "j"
 if (!isValidKeys(initialKeyPositive, initialKeyNegative)) {
-  initialKeyPositive = "1"
-  initialKeyNegative = "0"
-  localStorage.setItem(StorageKey.KeyPositive, "1")
-  localStorage.setItem(StorageKey.KeyNegative, "0")
+  initialKeyPositive = "f"
+  initialKeyNegative = "j"
+  localStorage.setItem(StorageKey.KeyPositive, "f")
+  localStorage.setItem(StorageKey.KeyNegative, "j")
 }
 
 function App() {
@@ -207,9 +207,9 @@ function App() {
       return
     }
 
-    // set video to 5 seconds before first click if possible
+    // set video to 3 seconds before first click if possible
     const firstClickTime = Math.min(...scoreMap.keys())
-    youtubePlayer.current.seekTo(Math.max(firstClickTime - 5, 0))
+    youtubePlayer.current.seekTo(Math.max(firstClickTime - 3, 0))
 
     // start interval
     const intervalId = window.setInterval(
