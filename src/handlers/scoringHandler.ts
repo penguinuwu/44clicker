@@ -77,14 +77,18 @@ export function generateClickListener(
       return
     }
 
-    if (event.key === keyPositive || event.key === keyNegative) {
+    const upperKey = event.key.toUpperCase()
+    if (
+      upperKey === keyPositive.toUpperCase() ||
+      upperKey === keyNegative.toUpperCase()
+    ) {
       // disable default key actions
       event.preventDefault()
       event.stopPropagation()
       event.stopImmediatePropagation()
 
       // get score
-      const clickScore = event.key === keyPositive ? +1 : -1
+      const clickScore = upperKey === keyPositive.toUpperCase() ? +1 : -1
 
       addClick(
         appMode,

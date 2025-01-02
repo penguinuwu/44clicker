@@ -278,7 +278,7 @@ function App() {
                     label="Positive Click Key"
                     variant="outlined"
                     type="text"
-                    value={keyPositive}
+                    value={keyPositive.toUpperCase()}
                     onChange={(e) => {
                       setKeyPositive(e.target.value)
                       localStorage.setItem(
@@ -315,7 +315,7 @@ function App() {
                     label="Negative Click Key"
                     variant="outlined"
                     type="text"
-                    value={keyNegative}
+                    value={keyNegative.toUpperCase()}
                     onChange={(e) => {
                       setKeyNegative(e.target.value)
                       localStorage.setItem(
@@ -414,7 +414,7 @@ function App() {
                 disabled={appMode !== AppMode.Scoring}
               >
                 +1
-                <br />[{keyPositive}]
+                <br />[{keyPositive.toUpperCase()}]
               </Button>
               <CardMedia
                 component={YouTubePlayer}
@@ -466,7 +466,7 @@ function App() {
                 disabled={appMode !== AppMode.Scoring}
               >
                 -1
-                <br />[{keyNegative}]
+                <br />[{keyNegative.toUpperCase()}]
               </Button>
             </Stack>
             <Stack spacing={0} direction="row" display={{ md: "none" }}>
