@@ -9,6 +9,7 @@ import CardMedia from "@mui/material/CardMedia"
 import Grid2 from "@mui/material/Grid2"
 import Stack from "@mui/material/Stack"
 import TextField from "@mui/material/TextField"
+import Tooltip from "@mui/material/Tooltip"
 import Typography from "@mui/material/Typography"
 import { useEffect, useRef, useState } from "react"
 import YouTubePlayer from "react-player/youtube"
@@ -28,6 +29,9 @@ import {
 } from "$/handlers/userInputHandler"
 import {
   AppMode,
+  DEFAULT_JUDGE_NAME,
+  DEFAULT_VIDEO_ID,
+  DefaultKeys,
   INTERVAL_DELAY,
   JUDGE_NAME_LIMIT,
   StorageKey,
@@ -46,13 +50,15 @@ const db = init<ScoreJson>({
 })
 
 // get keys from localstorage
-let initialKeyPositive = localStorage.getItem(StorageKey.KeyPositive) || "f"
-let initialKeyNegative = localStorage.getItem(StorageKey.KeyNegative) || "j"
+let initialKeyPositive =
+  localStorage.getItem(StorageKey.KeyPositive) || DefaultKeys.KeyPositive
+let initialKeyNegative =
+  localStorage.getItem(StorageKey.KeyNegative) || DefaultKeys.KeyNegative
 if (!isValidKeys(initialKeyPositive, initialKeyNegative)) {
-  initialKeyPositive = "f"
-  initialKeyNegative = "j"
-  localStorage.setItem(StorageKey.KeyPositive, "f")
-  localStorage.setItem(StorageKey.KeyNegative, "j")
+  initialKeyPositive = DefaultKeys.KeyPositive
+  initialKeyNegative = DefaultKeys.KeyNegative
+  localStorage.setItem(StorageKey.KeyPositive, DefaultKeys.KeyPositive)
+  localStorage.setItem(StorageKey.KeyNegative, DefaultKeys.KeyNegative)
 }
 
 function App() {
@@ -62,9 +68,9 @@ function App() {
   // video information
   const youtubePlayer = useRef<YouTubePlayer | null>(null)
   const [videoUrl, setVideoUrl] = useState(
-    "https://www.youtube.com/watch?v=Hnn_-y59a84",
+    `https://www.youtube.com/watch?v=${DEFAULT_VIDEO_ID}`,
   )
-  const [videoId, setVideoId] = useState("Hnn_-y59a84")
+  const [videoId, setVideoId] = useState(DEFAULT_VIDEO_ID)
   const [videoReady, setVideoReady] = useState(false)
   const [videoDuration, setVideoDuration] = useState(0)
 
@@ -112,7 +118,8 @@ function App() {
   const [keyPositive, setKeyPositive] = useState(initialKeyPositive)
   const [keyNegative, setKeyNegative] = useState<string>(initialKeyNegative)
   const [judgeName, setJudgeName] = useState<string>(() => {
-    const initialJudgeName = localStorage.getItem(StorageKey.JudgeName) || ""
+    const initialJudgeName =
+      localStorage.getItem(StorageKey.JudgeName) || DEFAULT_JUDGE_NAME
     return `${initialJudgeName}`.substring(0, JUDGE_NAME_LIMIT)
   })
 
@@ -343,46 +350,52 @@ function App() {
             <Card>
               <CardContent>
                 <Stack direction={{ xs: "row", sm: "column", md: "row" }}>
-                  <Button
-                    id="reset-scores"
-                    name="reset-scores"
-                    color="error"
-                    variant="text"
-                    startIcon={<DeleteIcon />}
-                    onClick={() => resetScoreMap(setScoreMap, false)}
-                    disabled={appMode !== AppMode.Scoring || scoreMap.size <= 0}
-                    size="large"
-                  >
-                    Reset
-                  </Button>
-                  <Button
-                    id="app-mode"
-                    name="app-mode"
-                    startIcon={
-                      appMode === AppMode.Playback ? (
-                        <PauseCircleOutlinedIcon />
-                      ) : (
-                        <PlayCircleOutlineIcon />
-                      )
-                    }
-                    color={appMode === AppMode.Playback ? "error" : "success"}
-                    variant={
-                      appMode === AppMode.Playback ? "contained" : "outlined"
-                    }
-                    onClick={() =>
-                      appMode === AppMode.Playback
-                        ? setAppMode(AppMode.Scoring)
-                        : setAppMode(AppMode.Playback)
-                    }
-                    disabled={
-                      !(appMode === AppMode.Playback || scoreMap.size > 0)
-                    }
-                    size="large"
-                  >
-                    {appMode === AppMode.Playback
-                      ? "Stop Play Back"
-                      : "Play Back"}
-                  </Button>
+                  <Tooltip title="Delete all clicks">
+                    <Button
+                      id="reset-scores"
+                      name="reset-scores"
+                      color="error"
+                      variant="text"
+                      startIcon={<DeleteIcon />}
+                      onClick={() => resetScoreMap(setScoreMap, false)}
+                      disabled={
+                        appMode !== AppMode.Scoring || scoreMap.size <= 0
+                      }
+                      size="large"
+                    >
+                      Reset
+                    </Button>
+                  </Tooltip>
+                  <Tooltip title="Toggle clicker replay">
+                    <Button
+                      id="app-mode"
+                      name="app-mode"
+                      startIcon={
+                        appMode === AppMode.Playback ? (
+                          <PauseCircleOutlinedIcon />
+                        ) : (
+                          <PlayCircleOutlineIcon />
+                        )
+                      }
+                      color={appMode === AppMode.Playback ? "error" : "success"}
+                      variant={
+                        appMode === AppMode.Playback ? "contained" : "outlined"
+                      }
+                      onClick={() =>
+                        appMode === AppMode.Playback
+                          ? setAppMode(AppMode.Scoring)
+                          : setAppMode(AppMode.Playback)
+                      }
+                      disabled={
+                        !(appMode === AppMode.Playback || scoreMap.size > 0)
+                      }
+                      size="large"
+                    >
+                      {appMode === AppMode.Playback
+                        ? "Stop Play Back"
+                        : "Play Back"}
+                    </Button>
+                  </Tooltip>
                 </Stack>
               </CardContent>
             </Card>

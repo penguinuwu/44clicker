@@ -14,6 +14,7 @@ import Slide from "@mui/material/Slide"
 import Stack from "@mui/material/Stack"
 import TextField from "@mui/material/TextField"
 import Toolbar from "@mui/material/Toolbar"
+import Tooltip from "@mui/material/Tooltip"
 import Typography from "@mui/material/Typography"
 import useScrollTrigger from "@mui/material/useScrollTrigger"
 import { useState } from "react"
@@ -108,20 +109,22 @@ function HeaderBar({
     />
   )
   const buttonPublishScores = (
-    <Button
-      id="publish-scores"
-      name="publish-scores"
-      variant="contained"
-      startIcon={<CloudUploadIcon />}
-      onClick={() => {
-        publishScores(db, videoId, judgeName, scoreMap, setPublishUrlResult)
-        handleMobileMenuClose()
-      }}
-      disabled={appMode !== AppMode.Scoring || scoreMap.size <= 0}
-      sx={{ flexGrow: { xs: 1, md: 0 } }}
-    >
-      Upload Scores
-    </Button>
+    <Tooltip title="Upload scores to share your clicker replay!">
+      <Button
+        id="publish-scores"
+        name="publish-scores"
+        variant="contained"
+        startIcon={<CloudUploadIcon />}
+        onClick={() => {
+          publishScores(db, videoId, judgeName, scoreMap, setPublishUrlResult)
+          handleMobileMenuClose()
+        }}
+        disabled={appMode !== AppMode.Scoring || scoreMap.size <= 0}
+        sx={{ flexGrow: { xs: 1, md: 0 } }}
+      >
+        Upload Scores
+      </Button>
+    </Tooltip>
   )
 
   // hidden menu for mobile

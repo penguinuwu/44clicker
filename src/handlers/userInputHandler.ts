@@ -272,7 +272,7 @@ export async function publishScores(
     .then(() =>
       setPublishUrlResult({
         url,
-        status: "Score published! Find the score at:",
+        status: "Score uploaded! Find the score at:",
       }),
     )
     .catch((e) => {
@@ -283,12 +283,12 @@ export async function publishScores(
       ) {
         setPublishUrlResult({
           url,
-          status: "This score has already been published! Find the score at:",
+          status: "This score has already been uploaded! Find the score at:",
         })
       } else {
         setPublishUrlResult({
           url: undefined,
-          status: "Error: score publish failed :[",
+          status: "Error: score upload failed :[",
         })
       }
     })

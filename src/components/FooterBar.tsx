@@ -7,6 +7,7 @@ import Divider from "@mui/material/Divider"
 import Link from "@mui/material/Link"
 import Paper from "@mui/material/Paper"
 import Stack from "@mui/material/Stack"
+import Tooltip from "@mui/material/Tooltip"
 import Typography from "@mui/material/Typography"
 
 import { downloadScores } from "$/handlers/userInputHandler"
@@ -89,27 +90,31 @@ function FooterBar({
         alignItems="center"
         sx={{ flexWrap: "wrap" }}
       >
-        <Button
-          id="import-scores"
-          name="import-scores"
-          startIcon={<FileUploadIcon />}
-          onClick={() => fileUploadElement.current?.click()}
-          disabled={appMode !== AppMode.Scoring}
-        >
-          Import Scores
-        </Button>
+        <Tooltip title="Import scores via JSON file">
+          <Button
+            id="import-scores"
+            name="import-scores"
+            startIcon={<FileUploadIcon />}
+            onClick={() => fileUploadElement.current?.click()}
+            disabled={appMode !== AppMode.Scoring}
+          >
+            Import Scores
+          </Button>
+        </Tooltip>
         <Divider orientation="vertical" variant="middle" flexItem />
-        <Button
-          id="download-scores"
-          name="download-scores"
-          startIcon={<FileDownloadIcon />}
-          onClick={() =>
-            downloadScores(filesDownloadElement, videoId, judgeName, scoreMap)
-          }
-          disabled={scoreMap.size <= 0}
-        >
-          Download Scores
-        </Button>
+        <Tooltip title="Download scores JSON file">
+          <Button
+            id="download-scores"
+            name="download-scores"
+            startIcon={<FileDownloadIcon />}
+            onClick={() =>
+              downloadScores(filesDownloadElement, videoId, judgeName, scoreMap)
+            }
+            disabled={scoreMap.size <= 0}
+          >
+            Download Scores
+          </Button>
+        </Tooltip>
       </Stack>
     </Paper>
   )

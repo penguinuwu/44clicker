@@ -50,6 +50,11 @@ const theme = createTheme({
         },
       },
     },
+    MuiTooltip: {
+      defaultProps: {
+        arrow: true,
+      }
+    },
     MuiFormControl: {
       defaultProps: {
         variant: "outlined",

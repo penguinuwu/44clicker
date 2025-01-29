@@ -36,7 +36,7 @@ function PublishScoresDialog({ publishUrlResult, setPublishUrlResult }: Props) {
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >
-      <DialogTitle id="alert-dialog-title">Publish Scores</DialogTitle>
+      <DialogTitle id="alert-dialog-title">Upload Scores</DialogTitle>
 
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
