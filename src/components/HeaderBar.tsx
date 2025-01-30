@@ -76,6 +76,7 @@ function HeaderBar({
             setVideoUrl,
             setVideoReady,
             setVideoId,
+            false,
           )
           regainClickerFocus(appMode)
         }
@@ -96,6 +97,7 @@ function HeaderBar({
                     setVideoUrl,
                     setVideoReady,
                     setVideoId,
+                    false,
                   )
                   regainClickerFocus(appMode)
                 }}

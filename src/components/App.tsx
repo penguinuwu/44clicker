@@ -149,6 +149,7 @@ function App() {
                 setVideoId,
                 setJudgeName,
                 scoreJson,
+                true,
               )
             ) {
               setAppMode(AppMode.Playback)
@@ -412,7 +413,20 @@ function App() {
         </Grid2>
 
         {/* video */}
-        <Card>
+        <Card
+          sx={[
+            // pulse video shadow in playback
+            appMode === AppMode.Playback && {
+              "@keyframes pulse": {
+                "0%": { boxShadow: "0 0 10px darkgreen" },
+                "50%": { boxShadow: "0 0 50px darkgreen" },
+                "100%": { boxShadow: "0 0 10px darkgreen" },
+              },
+              boxShadow: "0 0 50px darkgreen",
+              animation: "pulse 3s linear infinite",
+            },
+          ]}
+        >
           <Stack spacing={0} direction="column" flexGrow={1}>
             <Stack spacing={0} direction="row">
               <Button

@@ -13,6 +13,7 @@ import { getScoreJson, youtubeVideoIdToUrl } from "$/helpers/utils"
  * @param setVideoUrl
  * @param setVideoReady
  * @param setVideoId
+ * @param confirmed skip confirmation popup
  * @returns void
  */
 export function changeVideo(
@@ -22,6 +23,7 @@ export function changeVideo(
   setVideoUrl: React.Dispatch<React.SetStateAction<string>>,
   setVideoReady: React.Dispatch<React.SetStateAction<boolean>>,
   setVideoId: React.Dispatch<React.SetStateAction<string>>,
+  confirmed: boolean,
 ) {
   // update text box url
   setVideoUrl(inputLink)
@@ -51,8 +53,10 @@ export function changeVideo(
   // confirm change video
   // TODO: get video title from ID
   if (
+    !confirmed &&
     !window.confirm(
-      `Confirm changing video to ${extractedId}?\nThis will reset your scores!`,
+      `Confirm changing video to ${extractedId}?\n` +
+        `This will reset your scores!`,
     )
   ) {
     window.alert("Score import cancelled")
@@ -118,6 +122,7 @@ export async function downloadScores(
  * @param setVideoId
  * @param setJudgeName
  * @param scoreJson
+ * @param confirmed skip confirmation popup
  * @returns whether import succeeded
  */
 export async function importScoreJson(
@@ -128,6 +133,7 @@ export async function importScoreJson(
   setVideoId: React.Dispatch<React.SetStateAction<string>>,
   setJudgeName: React.Dispatch<React.SetStateAction<string>>,
   scoreJson: ScoreJson,
+  confirm: boolean,
 ) {
   console.debug(`import scores JSON`)
   console.debug(scoreJson)
@@ -170,6 +176,7 @@ export async function importScoreJson(
       setVideoUrl,
       setVideoReady,
       setVideoId,
+      confirm,
     )
   ) {
     window.alert("Error: invalid video link")
@@ -226,6 +233,7 @@ export async function importScoresFromFile(
       setVideoId,
       setJudgeName,
       scoreJson,
+      true,
     )
   } catch (error) {
     console.debug(error)
