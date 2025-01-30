@@ -38,6 +38,9 @@ export const INTERVAL_DELAY = 10
 // it's unlikely for users to intentionally seek +/- 50ms
 export const INTERVAL_DELAY_THRESHOLD = 0.05
 
+// set video a few seconds before first click if possible
+export const REPLAY_REWIND = 5
+
 // box-shadow syntax:
 // <inset> <offset-x> <offset-y> <blur-radius> <spread-radius> <colour>
 // inset: inner box-shadow

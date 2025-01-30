@@ -110,20 +110,22 @@ function HeaderBar({
   )
   const buttonPublishScores = (
     <Tooltip title="Upload scores to share your clicker replay!">
-      <Button
-        id="publish-scores"
-        name="publish-scores"
-        variant="contained"
-        startIcon={<CloudUploadIcon />}
-        onClick={() => {
-          publishScores(db, videoId, judgeName, scoreMap, setPublishUrlResult)
-          handleMobileMenuClose()
-        }}
-        disabled={appMode !== AppMode.Scoring || scoreMap.size <= 0}
-        sx={{ flexGrow: { xs: 1, md: 0 } }}
-      >
-        Upload Scores
-      </Button>
+      <span>
+        <Button
+          id="publish-scores"
+          name="publish-scores"
+          variant="contained"
+          startIcon={<CloudUploadIcon />}
+          onClick={() => {
+            publishScores(db, videoId, judgeName, scoreMap, setPublishUrlResult)
+            handleMobileMenuClose()
+          }}
+          disabled={appMode !== AppMode.Scoring || scoreMap.size <= 0}
+          sx={{ flexGrow: { xs: 1, md: 0 } }}
+        >
+          Upload Scores
+        </Button>
+      </span>
     </Tooltip>
   )
 

@@ -91,29 +91,38 @@ function FooterBar({
         sx={{ flexWrap: "wrap" }}
       >
         <Tooltip title="Import scores via JSON file">
-          <Button
-            id="import-scores"
-            name="import-scores"
-            startIcon={<FileUploadIcon />}
-            onClick={() => fileUploadElement.current?.click()}
-            disabled={appMode !== AppMode.Scoring}
-          >
-            Import Scores
-          </Button>
+          <span>
+            <Button
+              id="import-scores"
+              name="import-scores"
+              startIcon={<FileUploadIcon />}
+              onClick={() => fileUploadElement.current?.click()}
+              disabled={appMode !== AppMode.Scoring}
+            >
+              Import Scores
+            </Button>
+          </span>
         </Tooltip>
         <Divider orientation="vertical" variant="middle" flexItem />
         <Tooltip title="Download scores JSON file">
-          <Button
-            id="download-scores"
-            name="download-scores"
-            startIcon={<FileDownloadIcon />}
-            onClick={() =>
-              downloadScores(filesDownloadElement, videoId, judgeName, scoreMap)
-            }
-            disabled={scoreMap.size <= 0}
-          >
-            Download Scores
-          </Button>
+          <span>
+            <Button
+              id="download-scores"
+              name="download-scores"
+              startIcon={<FileDownloadIcon />}
+              onClick={() =>
+                downloadScores(
+                  filesDownloadElement,
+                  videoId,
+                  judgeName,
+                  scoreMap,
+                )
+              }
+              disabled={scoreMap.size <= 0}
+            >
+              Download Scores
+            </Button>
+          </span>
         </Tooltip>
       </Stack>
     </Paper>

@@ -1,3 +1,5 @@
+import Hashids from "hashids"
+
 import { AppMode, JUDGE_NAME_LIMIT } from "$/helpers/constants"
 import { ScoreJson } from "$/helpers/types"
 
@@ -82,7 +84,7 @@ export function findIndexSorted<T>(
 }
 
 /**
- * generate SHA-512 hash
+ * generate SHA-1 hash
  * https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest#converting_a_digest_to_a_hex_string
  * @param message
  * @returns string
@@ -97,12 +99,27 @@ export async function hash(message: string) {
   // convert buffer to byte array
   const hashArray = Array.from(new Uint8Array(hashBuffer))
 
-  // convert bytes to base64 string
-  // https://stackoverflow.com/a/11562550
-  return btoa(String.fromCharCode(...hashArray))
+  // convert bytes to hex string
+  const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("")
 
-  // // convert bytes to hex string
-  // return hashArray.map((b) => b.toString(94).padStart(2, "0")).join("")
+  // simple hash with custom alphabet
+  // https://github.com/niieani/hashids.js
+  const hashString = new Hashids(
+    undefined,
+    20,
+    "0123456789" +
+      "abcdefghijklmnopqrstuvwxyz" +
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+      "-_",
+  ).encodeHex(hashHex)
+
+  // limit to 20 characters
+  const hashTruncated = `${hashString}`.substring(0, 20)
+  return hashTruncated
+
+  // // convert bytes to base64 string
+  // // https://stackoverflow.com/a/11562550
+  // return btoa(String.fromCharCode(...hashArray))
 
   // // convert bytes to ascii string
   // return new TextDecoder().decode(hashBuffer)

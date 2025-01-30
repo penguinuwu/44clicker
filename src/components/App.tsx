@@ -34,6 +34,7 @@ import {
   DefaultKeys,
   INTERVAL_DELAY,
   JUDGE_NAME_LIMIT,
+  REPLAY_REWIND,
   StorageKey,
 } from "$/helpers/constants"
 import { ScoreJson } from "$/helpers/types"
@@ -214,9 +215,9 @@ function App() {
       return
     }
 
-    // set video to 3 seconds before first click if possible
+    // set video a few seconds before first click if possible
     const firstClickTime = Math.min(...scoreMap.keys())
-    youtubePlayer.current.seekTo(Math.max(firstClickTime - 3, 0))
+    youtubePlayer.current.seekTo(Math.max(firstClickTime - REPLAY_REWIND, 0))
 
     // start interval
     const intervalId = window.setInterval(
@@ -351,50 +352,58 @@ function App() {
               <CardContent>
                 <Stack direction={{ xs: "row", sm: "column", md: "row" }}>
                   <Tooltip title="Delete all clicks">
-                    <Button
-                      id="reset-scores"
-                      name="reset-scores"
-                      color="error"
-                      variant="text"
-                      startIcon={<DeleteIcon />}
-                      onClick={() => resetScoreMap(setScoreMap, false)}
-                      disabled={
-                        appMode !== AppMode.Scoring || scoreMap.size <= 0
-                      }
-                      size="large"
-                    >
-                      Reset
-                    </Button>
+                    <span>
+                      <Button
+                        id="reset-scores"
+                        name="reset-scores"
+                        color="error"
+                        variant="text"
+                        startIcon={<DeleteIcon />}
+                        onClick={() => resetScoreMap(setScoreMap, false)}
+                        disabled={
+                          appMode !== AppMode.Scoring || scoreMap.size <= 0
+                        }
+                        size="large"
+                      >
+                        Reset
+                      </Button>
+                    </span>
                   </Tooltip>
                   <Tooltip title="Toggle clicker replay">
-                    <Button
-                      id="app-mode"
-                      name="app-mode"
-                      startIcon={
-                        appMode === AppMode.Playback ? (
-                          <PauseCircleOutlinedIcon />
-                        ) : (
-                          <PlayCircleOutlineIcon />
-                        )
-                      }
-                      color={appMode === AppMode.Playback ? "error" : "success"}
-                      variant={
-                        appMode === AppMode.Playback ? "contained" : "outlined"
-                      }
-                      onClick={() =>
-                        appMode === AppMode.Playback
-                          ? setAppMode(AppMode.Scoring)
-                          : setAppMode(AppMode.Playback)
-                      }
-                      disabled={
-                        !(appMode === AppMode.Playback || scoreMap.size > 0)
-                      }
-                      size="large"
-                    >
-                      {appMode === AppMode.Playback
-                        ? "Stop Play Back"
-                        : "Play Back"}
-                    </Button>
+                    <span>
+                      <Button
+                        id="app-mode"
+                        name="app-mode"
+                        startIcon={
+                          appMode === AppMode.Playback ? (
+                            <PauseCircleOutlinedIcon />
+                          ) : (
+                            <PlayCircleOutlineIcon />
+                          )
+                        }
+                        color={
+                          appMode === AppMode.Playback ? "error" : "success"
+                        }
+                        variant={
+                          appMode === AppMode.Playback
+                            ? "contained"
+                            : "outlined"
+                        }
+                        onClick={() =>
+                          appMode === AppMode.Playback
+                            ? setAppMode(AppMode.Scoring)
+                            : setAppMode(AppMode.Playback)
+                        }
+                        disabled={
+                          !(appMode === AppMode.Playback || scoreMap.size > 0)
+                        }
+                        size="large"
+                      >
+                        {appMode === AppMode.Playback
+                          ? "Stop Play Back"
+                          : "Play Back"}
+                      </Button>
+                    </span>
                   </Tooltip>
                 </Stack>
               </CardContent>
