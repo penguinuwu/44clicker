@@ -31,6 +31,7 @@ function PublishScoresDialog({ publishUrlResult, setPublishUrlResult }: Props) {
 
   return (
     <Dialog
+      fullWidth
       open={publishUrlResult.status !== undefined}
       onClose={handleClose}
       aria-labelledby="alert-dialog-title"
@@ -46,9 +47,9 @@ function PublishScoresDialog({ publishUrlResult, setPublishUrlResult }: Props) {
         {/* url */}
         {publishUrlResult.url !== undefined && (
           <TextField
+            fullWidth
             type="text"
             value={publishUrlResult.url}
-            sx={{ width: "100%" }}
             slotProps={{
               input: {
                 endAdornment: (
