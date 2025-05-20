@@ -283,43 +283,6 @@ function App() {
               <CardContent sx={{ flexGrow: 1 }}>
                 <Stack direction="row">
                   <TextField
-                    id="key-positive"
-                    label="Positive Click Key"
-                    variant="outlined"
-                    type="text"
-                    value={keyPositive.toUpperCase()}
-                    onChange={(e) => {
-                      setKeyPositive(e.target.value)
-                      localStorage.setItem(
-                        StorageKey.KeyPositive,
-                        e.target.value,
-                      )
-                    }}
-                    error={!isValidKeys(keyPositive, keyNegative)}
-                    slotProps={{ htmlInput: { minLength: 1, maxLength: 1 } }}
-                    required
-                    disabled={appMode !== AppMode.Scoring}
-                    sx={{
-                      minWidth: "22%",
-                      display: { xs: "none", md: "inline-block" },
-                    }}
-                    helperText="Shortcut for +1"
-                  />
-
-                  <TextField
-                    id="judge-name"
-                    label="Judge Name"
-                    variant="outlined"
-                    type="text"
-                    value={judgeName}
-                    onChange={(e) => setJudgeName(e.target.value)}
-                    slotProps={{ htmlInput: { maxLength: JUDGE_NAME_LIMIT } }}
-                    disabled={appMode !== AppMode.Scoring}
-                    sx={{ width: "100%" }}
-                    helperText="Optional name up to 30 characters"
-                  />
-
-                  <TextField
                     id="key-negative"
                     label="Negative Click Key"
                     variant="outlined"
@@ -341,6 +304,43 @@ function App() {
                       display: { xs: "none", md: "inline-block" },
                     }}
                     helperText="Shortcut for -1"
+                  />
+
+                  <TextField
+                    id="judge-name"
+                    label="Judge Name"
+                    variant="outlined"
+                    type="text"
+                    value={judgeName}
+                    onChange={(e) => setJudgeName(e.target.value)}
+                    slotProps={{ htmlInput: { maxLength: JUDGE_NAME_LIMIT } }}
+                    disabled={appMode !== AppMode.Scoring}
+                    sx={{ width: "100%" }}
+                    helperText="Optional name up to 30 characters"
+                  />
+
+                  <TextField
+                    id="key-positive"
+                    label="Positive Click Key"
+                    variant="outlined"
+                    type="text"
+                    value={keyPositive.toUpperCase()}
+                    onChange={(e) => {
+                      setKeyPositive(e.target.value)
+                      localStorage.setItem(
+                        StorageKey.KeyPositive,
+                        e.target.value,
+                      )
+                    }}
+                    error={!isValidKeys(keyPositive, keyNegative)}
+                    slotProps={{ htmlInput: { minLength: 1, maxLength: 1 } }}
+                    required
+                    disabled={appMode !== AppMode.Scoring}
+                    sx={{
+                      minWidth: "22%",
+                      display: { xs: "none", md: "inline-block" },
+                    }}
+                    helperText="Shortcut for +1"
                   />
                 </Stack>
               </CardContent>
@@ -428,13 +428,12 @@ function App() {
           ]}
         >
           <Stack spacing={0} direction="column" flexGrow={1}>
-            <Stack spacing={0} direction="row">
+            <Stack spacing={0} direction="row" sx={{ flexGrow: 1 }}>
               <Button
                 variant="contained"
-                color="success"
+                color="error"
                 sx={{
-                  borderTopRightRadius: 0,
-                  borderBottomRightRadius: 0,
+                  borderRadius: 0,
                   display: { xs: "none", md: "inline-flex" },
                 }}
                 onClick={() =>
@@ -444,13 +443,13 @@ function App() {
                     videoDuration,
                     youtubePlayer,
                     setScoreMap,
-                    +1,
+                    -1,
                   )
                 }
                 disabled={appMode !== AppMode.Scoring}
               >
-                +1
-                <br />[{keyPositive.toUpperCase()}]
+                -1
+                <br />[{keyNegative.toUpperCase()}]
               </Button>
               <CardMedia
                 component={YouTubePlayer}
@@ -483,39 +482,10 @@ function App() {
               />
               <Button
                 variant="contained"
-                color="error"
-                sx={{
-                  borderTopLeftRadius: 0,
-                  borderBottomLeftRadius: 0,
-                  display: { xs: "none", md: "inline-flex" },
-                }}
-                onClick={() =>
-                  addClick(
-                    appMode,
-                    videoReady,
-                    videoDuration,
-                    youtubePlayer,
-                    setScoreMap,
-                    -1,
-                  )
-                }
-                disabled={appMode !== AppMode.Scoring}
-              >
-                -1
-                <br />[{keyNegative.toUpperCase()}]
-              </Button>
-            </Stack>
-            <Stack spacing={0} direction="row" display={{ md: "none" }}>
-              <Button
-                variant="contained"
                 color="success"
-                size="large"
                 sx={{
-                  flexGrow: 1,
-                  borderTopLeftRadius: 0,
-                  borderTopRightRadius: 0,
-                  borderBottomRightRadius: 0,
-                  lineHeight: 2,
+                  borderRadius: 0,
+                  display: { xs: "none", md: "inline-flex" },
                 }}
                 onClick={() =>
                   addClick(
@@ -530,18 +500,20 @@ function App() {
                 disabled={appMode !== AppMode.Scoring}
               >
                 +1
+                <br />[{keyPositive.toUpperCase()}]
               </Button>
+            </Stack>
+            <Stack
+              spacing={0}
+              direction="row"
+              display={{ md: "none" }}
+              sx={{ borderTopRightRadius: 0, borderTopLeftRadius: 0 }}
+            >
               <Button
                 variant="contained"
                 color="error"
                 size="large"
-                sx={{
-                  flexGrow: 1,
-                  borderTopRightRadius: 0,
-                  borderTopLeftRadius: 0,
-                  borderBottomLeftRadius: 0,
-                  lineHeight: 2,
-                }}
+                sx={{ flexGrow: 1, lineHeight: 2, borderRadius: 0 }}
                 onClick={() =>
                   addClick(
                     appMode,
@@ -556,6 +528,25 @@ function App() {
               >
                 -1
               </Button>
+              <Button
+                variant="contained"
+                color="success"
+                size="large"
+                sx={{ flexGrow: 1, lineHeight: 2, borderRadius: 0 }}
+                onClick={() =>
+                  addClick(
+                    appMode,
+                    videoReady,
+                    videoDuration,
+                    youtubePlayer,
+                    setScoreMap,
+                    +1,
+                  )
+                }
+                disabled={appMode !== AppMode.Scoring}
+              >
+                +1
+              </Button>
             </Stack>
           </Stack>
         </Card>
@@ -564,13 +555,14 @@ function App() {
         <Stack direction={{ xs: "column", sm: "row" }}>
           <Card>
             <CardContent>
-              <Typography variant="body1">Positive Clicks</Typography>
-              <Typography variant="h5" color="green">
-                {"+ "}
-                {displayScorePositive}
+              <Typography variant="body1">Negative Clicks</Typography>
+              <Typography variant="h5" color="red">
+                {"- "}
+                {/* remove extra "-", we need the hardcoded "-" for "-0" */}
+                {displayScoreNegative * -1}
               </Typography>
               <Typography variant="caption">
-                {getScoresPerSecond(displayScorePositive, displayTotalTime)}
+                {getScoresPerSecond(displayScoreNegative, displayTotalTime)}
               </Typography>
             </CardContent>
           </Card>
@@ -590,14 +582,13 @@ function App() {
 
           <Card>
             <CardContent>
-              <Typography variant="body1">Negative Clicks</Typography>
-              <Typography variant="h5" color="red">
-                {"- "}
-                {/* remove extra "-", we need the hardcoded "-" for "-0" */}
-                {displayScoreNegative * -1}
+              <Typography variant="body1">Positive Clicks</Typography>
+              <Typography variant="h5" color="green">
+                {"+ "}
+                {displayScorePositive}
               </Typography>
               <Typography variant="caption">
-                {getScoresPerSecond(displayScoreNegative, displayTotalTime)}
+                {getScoresPerSecond(displayScorePositive, displayTotalTime)}
               </Typography>
             </CardContent>
           </Card>

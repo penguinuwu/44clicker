@@ -19,8 +19,8 @@ export enum PlayerStates {
 }
 
 export enum DefaultKeys {
-  KeyPositive = "f",
-  KeyNegative = "j",
+  KeyNegative = "f",
+  KeyPositive = "j",
 }
 export const DEFAULT_VIDEO_ID = "qYWOwzpSBd0"
 
