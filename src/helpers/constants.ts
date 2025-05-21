@@ -2,6 +2,7 @@ export enum StorageKey {
   JudgeName = "JUDGE_NAME",
   KeyPositive = "KEY_POSITIVE",
   KeyNegative = "KEY_NEGATIVE",
+  IsKeysFlipped = "IS_KEYS_FLIPPED",
 }
 
 export enum AppMode {

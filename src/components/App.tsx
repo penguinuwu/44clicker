@@ -2,6 +2,7 @@ import { init } from "@instantdb/react"
 import DeleteIcon from "@mui/icons-material/Delete"
 import PauseCircleOutlinedIcon from "@mui/icons-material/PauseCircleOutlined"
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline"
+import SyncAltIcon from "@mui/icons-material/SyncAlt"
 import Button from "@mui/material/Button"
 import Card from "@mui/material/Card"
 import CardContent from "@mui/material/CardContent"
@@ -62,6 +63,10 @@ if (!isValidKeys(initialKeyPositive, initialKeyNegative)) {
   localStorage.setItem(StorageKey.KeyNegative, DefaultKeys.KeyNegative)
 }
 
+// get whether the keys are flipped
+let initialIsKeysFlipped =
+  localStorage.getItem(StorageKey.IsKeysFlipped) === "true"
+
 function App() {
   // web app mode
   const [appMode, setAppMode] = useState(AppMode.Scoring)
@@ -118,6 +123,8 @@ function App() {
   // user input fields
   const [keyPositive, setKeyPositive] = useState(initialKeyPositive)
   const [keyNegative, setKeyNegative] = useState<string>(initialKeyNegative)
+  const [isKeysFlipped, setIsKeysFlipped] =
+    useState<boolean>(initialIsKeysFlipped)
   const [judgeName, setJudgeName] = useState<string>(() => {
     const initialJudgeName =
       localStorage.getItem(StorageKey.JudgeName) || DEFAULT_JUDGE_NAME
@@ -281,7 +288,10 @@ function App() {
           <Grid2 size={{ xs: 12, sm: 8 }}>
             <Card>
               <CardContent sx={{ flexGrow: 1 }}>
-                <Stack direction="row">
+                <Stack
+                  direction={isKeysFlipped ? "row-reverse" : "row"}
+                  spacing={{ xs: 0, md: 1, lg: 3 }}
+                >
                   <TextField
                     id="key-negative"
                     label="Negative Click Key"
@@ -351,7 +361,36 @@ function App() {
           <Grid2 size={{ xs: 12, sm: 4 }}>
             <Card>
               <CardContent>
-                <Stack direction={{ xs: "row", sm: "column", md: "row" }}>
+                <Stack
+                  direction={{ xs: "row", sm: "column", md: "row" }}
+                  useFlexGap // https://v6.mui.com/material-ui/react-stack/#flexbox-gap
+                  sx={{
+                    flexWrap: "wrap",
+                    "& > span": {
+                      display: "flex",
+                      flex: 1,
+                    },
+                    "& .MuiButton-root": {
+                      flexGrow: 1,
+                      whiteSpace: "nowrap",
+                    },
+                  }}
+                >
+                  <Tooltip title="Flip clicker keys">
+                    <span>
+                      <Button
+                        id="flip-keys"
+                        name="flip-keys"
+                        startIcon={<SyncAltIcon />}
+                        color="secondary"
+                        variant="text"
+                        onClick={() => setIsKeysFlipped((flipped) => !flipped)}
+                        size="large"
+                      >
+                        Flip Keys
+                      </Button>
+                    </span>
+                  </Tooltip>
                   <Tooltip title="Delete all clicks">
                     <span>
                       <Button
@@ -425,17 +464,26 @@ function App() {
               boxShadow: "0 0 50px darkgreen",
               animation: "pulse 3s linear infinite",
             },
+            {
+              // uniform clicker button styles
+              "& .MuiButton-root": {
+                flexGrow: 1,
+                lineHeight: 2,
+                borderRadius: 0,
+              },
+            },
           ]}
         >
           <Stack spacing={0} direction="column" flexGrow={1}>
-            <Stack spacing={0} direction="row" sx={{ flexGrow: 1 }}>
+            <Stack
+              spacing={0}
+              direction={isKeysFlipped ? "row-reverse" : "row"}
+              sx={{ flexGrow: 1 }}
+            >
               <Button
                 variant="contained"
                 color="error"
-                sx={{
-                  borderRadius: 0,
-                  display: { xs: "none", md: "inline-flex" },
-                }}
+                sx={{ display: { xs: "none", md: "inline-flex" } }}
                 onClick={() =>
                   addClick(
                     appMode,
@@ -483,10 +531,7 @@ function App() {
               <Button
                 variant="contained"
                 color="success"
-                sx={{
-                  borderRadius: 0,
-                  display: { xs: "none", md: "inline-flex" },
-                }}
+                sx={{ display: { xs: "none", md: "inline-flex" } }}
                 onClick={() =>
                   addClick(
                     appMode,
@@ -505,7 +550,7 @@ function App() {
             </Stack>
             <Stack
               spacing={0}
-              direction="row"
+              direction={isKeysFlipped ? "row-reverse" : "row"}
               display={{ md: "none" }}
               sx={{ borderTopRightRadius: 0, borderTopLeftRadius: 0 }}
             >
@@ -513,7 +558,6 @@ function App() {
                 variant="contained"
                 color="error"
                 size="large"
-                sx={{ flexGrow: 1, lineHeight: 2, borderRadius: 0 }}
                 onClick={() =>
                   addClick(
                     appMode,
@@ -532,7 +576,6 @@ function App() {
                 variant="contained"
                 color="success"
                 size="large"
-                sx={{ flexGrow: 1, lineHeight: 2, borderRadius: 0 }}
                 onClick={() =>
                   addClick(
                     appMode,
@@ -552,8 +595,13 @@ function App() {
         </Card>
 
         {/* score counter */}
-        <Stack direction={{ xs: "column", sm: "row" }}>
-          <Card>
+        <Stack
+          direction={{
+            xs: "column-reverse",
+            sm: isKeysFlipped ? "row-reverse" : "row",
+          }}
+        >
+          <Card sx={{ flex: 1 }}>
             <CardContent>
               <Typography variant="body1">Negative Clicks</Typography>
               <Typography variant="h5" color="red">
@@ -567,7 +615,7 @@ function App() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card sx={{ flex: 1 }}>
             <CardContent>
               <Typography variant="body1">Total Score</Typography>
               <Typography variant="h5" color="grey">
@@ -580,7 +628,7 @@ function App() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card sx={{ flex: 1 }}>
             <CardContent>
               <Typography variant="body1">Positive Clicks</Typography>
               <Typography variant="h5" color="green">
