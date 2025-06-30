@@ -1,4 +1,5 @@
 import { init } from "@instantdb/react"
+import { useEffect, useState } from "react"
 
 import { PlayerJson, VoteJson } from "$/helpers/types"
 
@@ -22,7 +23,13 @@ function Vote() {
   })
   console.debug(data)
 
-  const voterId = db.useLocalId("guest")
+  // generate voterId
+  const [voterId, setVoterId] = useState<string>()
+  useEffect(() => {
+    db.getLocalId("guest")
+      .then((v) => setVoterId(v))
+      .catch((e) => console.debug(e))
+  }, [])
   console.debug(`id: ${voterId}`)
 
   if (!voterId) {

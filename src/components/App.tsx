@@ -47,7 +47,7 @@ import {
 } from "$/helpers/utils"
 
 // init scores database
-const db = init({
+const db = init<ScoreJson>({
   appId: atob(`${import.meta.env.VITE_DB}`),
 })
 
