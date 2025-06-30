@@ -47,7 +47,7 @@ import {
 } from "$/helpers/utils"
 
 // init scores database
-const db = init<ScoreJson>({
+const db = init({
   appId: atob(`${import.meta.env.VITE_DB}`),
 })
 
@@ -135,13 +135,15 @@ function App() {
   useEffect(() => {
     const url = new URL(window.location.href)
     const params = new URLSearchParams(url.searchParams)
-    if (params.has("id")) {
+
+    // get recording id
+    const scoreHash = params.get("id")
+
+    if (scoreHash !== null) {
+      console.debug(scoreHash)
+
       // reset url
       window.history.pushState(null, "", "/")
-
-      // get recording id
-      const scoreHash = params.get("id")
-      console.debug(scoreHash)
 
       db.queryOnce({ scores: { $: { where: { hash: scoreHash } } } })
         .then(async ({ data }) => {
