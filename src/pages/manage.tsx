@@ -1,4 +1,7 @@
-import { init } from "@instantdb/react"
+import { id, init } from "@instantdb/react"
+import Button from "@mui/material/Button"
+import TextareaAutosize from "@mui/material/TextareaAutosize"
+import { useState } from "react"
 
 import { PlayerJson, VoteJson } from "$/helpers/types"
 
@@ -7,6 +10,10 @@ const db = init({
 })
 
 function Manage() {
+  // add new player name
+  const [newName, setNewName] = useState<string | null>(null)
+
+  // subscribe for player/vote changes
   const { isLoading, error, data } = db.useQuery({ players: {}, votes: {} })
 
   if (error) {
@@ -20,108 +27,136 @@ function Manage() {
   const players = data.players as PlayerJson[]
   const votes = data.votes as VoteJson[]
 
-  const playerLeft = players.find((p) => p.position === "left")
-  const totalLeft = votes.reduce(
-    (total, vote) => total + (vote.left ? 1 : 0),
-    0,
-  )
+  const playerTop = players.find((p) => p.position === "top")
+  const totalTop = votes.reduce((total, vote) => total + (vote.top ? 1 : 0), 0)
 
-  const playerRight = players.find((p) => p.position === "right")
-  const totalRight = votes.reduce(
-    (total, vote) => total + (vote.right ? 1 : 0),
+  const playerBottom = players.find((p) => p.position === "bottom")
+  const totalBottom = votes.reduce(
+    (total, vote) => total + (vote.bottom ? 1 : 0),
     0,
   )
 
   return (
     <>
-      {renderClearVotes(votes)}
-      {renderRecordVotes(playerLeft, totalLeft, playerRight, totalRight)}
-      {renderPlayers(players, playerLeft, playerRight)}
-      {renderPlayerPositionReset(players)}
+      <p>
+        1. {renderRecordVotes(playerTop, totalTop, playerBottom, totalBottom)}
+      </p>
+      <p>2. {renderPlayerPositionReset(players)}</p>
+      <p>3. {renderClearVotes(votes)}</p>
+
+      {renderPlayers(players, playerTop, playerBottom)}
+
+      <div>
+        <TextareaAutosize
+          onChange={(e) => setNewName(e.target.value)}
+          value={newName ?? ""}
+          minRows={3}
+        />
+        <Button
+          onClick={() => {
+            db.transact(
+              db.tx.players[id()].update({
+                name: newName,
+                votes: 0,
+              }),
+            )
+              .then(() => setNewName(null))
+              .catch((e) => setNewName(e))
+          }}
+          disabled={!newName}
+        >
+          add
+        </Button>
+      </div>
     </>
   )
 }
 
 function renderClearVotes(votes: VoteJson[]) {
   return (
-    <button
+    <Button
       onClick={() => {
         votes.forEach((vote) => {
           db.transact(
-            db.tx.votes[vote.id].update({ left: false, right: false }),
+            db.tx.votes[vote.id].update({ top: false, bottom: false }),
           )
         })
       }}
     >
       clear votes
-    </button>
+    </Button>
   )
 }
 
 function renderRecordVotes(
-  playerLeft: PlayerJson | undefined,
-  totalLeft: number,
-  playerRight: PlayerJson | undefined,
-  totalRight: number,
+  playerTop: PlayerJson | undefined,
+  totalTop: number,
+  playerBottom: PlayerJson | undefined,
+  totalBottom: number,
 ) {
   return (
     <>
       <p>
-        {playerLeft?.name}:{totalLeft}
+        {playerTop?.name ?? "top player not selected"} | Votes: {totalTop}
       </p>
       <p>
-        {playerRight?.name}:{totalRight}
+        {playerBottom?.name ?? "bottom player not selected"} | Votes:{" "}
+        {totalBottom}
       </p>
-      <button
+      <Button
         onClick={() => {
-          if (playerLeft) {
-            db.transact(
-              db.tx.players[playerLeft.id].update({ votes: totalLeft }),
-            )
+          if (playerTop) {
+            db.transact(db.tx.players[playerTop.id].update({ votes: totalTop }))
           }
 
-          if (playerRight) {
+          if (playerBottom) {
             db.transact(
-              db.tx.players[playerRight.id].update({ votes: totalRight }),
+              db.tx.players[playerBottom.id].update({ votes: totalBottom }),
             )
           }
         }}
       >
-        tally votes
-      </button>
+        record votes
+      </Button>
     </>
   )
 }
 
 function renderPlayers(
   players: PlayerJson[],
-  playerLeft: PlayerJson | undefined,
-  playerRight: PlayerJson | undefined,
+  playerTop: PlayerJson | undefined,
+  playerBottom: PlayerJson | undefined,
 ) {
   return (
     <ul>
       {players.map((player) => (
         <li key={player.id}>
-          name:'{player.name}' votes:'{player.votes}' {player.position}
-          <button
+          {player.name} - votes:{player.votes} - {player.position}
+          <br />
+          <Button
             onClick={() => {
-              if (playerLeft) updatePosition(playerLeft.id, null)
-              updatePosition(player.id, "left")
+              if (playerTop) updatePosition(playerTop.id, null)
+              updatePosition(player.id, "top")
             }}
-            disabled={player.id === playerLeft?.id}
+            disabled={player.id === playerTop?.id}
           >
-            left
-          </button>
-          <button
+            top
+          </Button>
+          <Button
             onClick={() => {
-              if (playerRight) updatePosition(playerRight.id, null)
-              updatePosition(player.id, "right")
+              if (playerBottom) updatePosition(playerBottom.id, null)
+              updatePosition(player.id, "bottom")
             }}
-            disabled={player.id === playerRight?.id}
+            disabled={player.id === playerBottom?.id}
           >
-            right
-          </button>
-          <button onClick={() => updatePosition(player.id, null)}>clear</button>
+            bottom
+          </Button>
+          <Button onClick={() => updatePosition(player.id, null)}>clear</Button>
+          <Button
+            onClick={() => db.transact(db.tx.players[player.id].delete())}
+          >
+            delete
+          </Button>
         </li>
       ))}
     </ul>
@@ -130,17 +165,17 @@ function renderPlayers(
 
 function renderPlayerPositionReset(players: PlayerJson[]) {
   return (
-    <button
+    <Button
       onClick={() => {
         players.forEach((player) => updatePosition(player.id, null))
       }}
     >
       reset players
-    </button>
+    </Button>
   )
 }
 
-function updatePosition(id: string, pos: "left" | "right" | null) {
+function updatePosition(id: string, pos: "top" | "bottom" | null) {
   console.debug(db.transact(db.tx.players[id].update({ position: pos })))
 }
 

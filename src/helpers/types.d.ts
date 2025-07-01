@@ -11,11 +11,11 @@ export type PlayerJson = {
   id: string
   name: string
   votes: number
-  position?: "left" | "right"
+  position?: "top" | "bottom"
 }
 
 export type VoteJson = {
   id: string
-  left?: boolean
-  right?: boolean
+  top?: boolean
+  bottom?: boolean
 }

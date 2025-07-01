@@ -1,6 +1,18 @@
 import { init } from "@instantdb/react"
+import Alert from "@mui/material/Alert"
+import Box from "@mui/material/Box"
+import Button from "@mui/material/Button"
+import Card from "@mui/material/Card"
+import CardContent from "@mui/material/CardContent"
+import CardHeader from "@mui/material/CardHeader"
+import CardMedia from "@mui/material/CardMedia"
+import CircularProgress from "@mui/material/CircularProgress"
+import Stack from "@mui/material/Stack"
+import Typography from "@mui/material/Typography"
 import { useEffect, useState } from "react"
 
+import FooterBar from "$/components/battle-voting/FooterBar"
+import HeaderBar from "$/components/battle-voting/HeaderBar"
 import { PlayerJson, VoteJson } from "$/helpers/types"
 
 const db = init({
@@ -33,58 +45,159 @@ function Vote() {
   console.debug(`id: ${voterId}`)
 
   if (!voterId) {
-    return <p className="italic text-gray-700">Initializing...</p>
+    return (
+      <Box
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        justifyContent="center"
+        minHeight="80vh"
+      >
+        <CircularProgress />
+        <Typography mt={2} sx={{ fontFamily: "monospace" }}>
+          Initializing...
+        </Typography>
+      </Box>
+    )
   }
   if (error) {
     console.debug(error)
-    return <p className="italic text-gray-700">Please reload the page...</p>
+    return (
+      <Box
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        justifyContent="center"
+        minHeight="80vh"
+      >
+        <Alert severity="error">Please reload the page...</Alert>
+      </Box>
+    )
   }
   if (isLoading) {
-    return <p className="italic text-gray-700">Loading...</p>
+    return (
+      <Box
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        justifyContent="center"
+        minHeight="80vh"
+      >
+        <CircularProgress />
+        <Typography mt={2} sx={{ fontFamily: "monospace" }}>
+          Loading...
+        </Typography>
+      </Box>
+    )
   }
 
   const players = data.players as PlayerJson[]
-  const playerLeft = players.find((p) => p.position === "left")
-  const playerRight = players.find((p) => p.position === "right")
+  const playerTop = players.find((p) => p.position === "top")
+  const playerBottom = players.find((p) => p.position === "bottom")
 
   // find the vote[voterId]
   const myVote = (data.votes as VoteJson[]).find((v) => v.id === voterId)
 
   return (
     <>
-      <div>Vote</div>
-      <button
-        onClick={() => {
-          db.transact(db.tx.votes[voterId].update({ left: !myVote?.left }))
-        }}
-        disabled={!playerLeft}
-      >
-        {playerLeft
-          ? voteOrUnvote(myVote?.left) + " for " + playerLeft?.name
-          : "Loading..."}
-      </button>
-      <button
-        onClick={() => {
-          db.transact(db.tx.votes[voterId].update({ right: !myVote?.right }))
-        }}
-        disabled={!playerLeft}
-      >
-        {playerRight
-          ? voteOrUnvote(myVote?.right) + " for " + playerRight?.name
-          : "Loading..."}
-      </button>
+      <HeaderBar />
 
-      <iframe
-        src="https://challonge.com/18qssxzv/module"
-        width="100%"
-        height="500"
-      ></iframe>
+      <Stack
+        marginX={{ xs: 2, sm: "10%", md: "20%", lg: "30%", xl: "35%" }}
+        marginY={{ xs: 2, md: 3 }}
+        paddingX={{ xs: 0, sm: 3, md: 5, lg: 2, xl: 1 }}
+      >
+        <Card sx={{ textAlign: "center", display: "block" }}>
+          <CardHeader
+            title="2025 Return Top Battle"
+            titleTypographyProps={{ variant: "h6" }}
+          />
+        </Card>
+        <Card sx={{ textAlign: "start", display: "block" }}>
+          <CardHeader
+            title="Vote for a Player"
+            titleTypographyProps={{ variant: "h6" }}
+            subheader="Tap to vote or unvote. You can change your vote at any time."
+            subheaderTypographyProps={{ variant: "body2" }}
+          />
+          <CardContent>
+            <Stack spacing={2}>
+              <Button
+                fullWidth
+                size="large"
+                variant={myVote?.top ? "outlined" : "contained"}
+                color={myVote?.top ? "success" : "primary"}
+                onClick={() =>
+                  db.transact(
+                    db.tx.votes[voterId].update({
+                      top: !myVote?.top,
+                      bottom: false,
+                    }),
+                  )
+                }
+                disabled={!playerTop}
+                sx={{ textTransform: "none", fontWeight: 600, borderRadius: 2 }}
+              >
+                {playerTop
+                  ? `${voteOrUnvote(myVote?.top)} for ${playerTop?.name}`
+                  : "Loading..."}
+              </Button>
+              <Button
+                fullWidth
+                size="large"
+                variant={myVote?.bottom ? "outlined" : "contained"}
+                color={myVote?.bottom ? "success" : "primary"}
+                onClick={() =>
+                  db.transact(
+                    db.tx.votes[voterId].update({
+                      bottom: !myVote?.bottom,
+                      top: false,
+                    }),
+                  )
+                }
+                disabled={!playerBottom}
+                sx={{ textTransform: "none", fontWeight: 600, borderRadius: 2 }}
+              >
+                {playerBottom
+                  ? `${voteOrUnvote(myVote?.bottom)} for ${playerBottom?.name}`
+                  : "Loading..."}
+              </Button>
+              <Alert
+                severity={myVote?.top || myVote?.bottom ? "success" : "info"}
+                sx={{ mt: 1, fontSize: "1rem" }}
+              >
+                {myVote?.top || myVote?.bottom
+                  ? "You have voted for: " +
+                    ((myVote?.top && playerTop?.name) ||
+                      (myVote?.bottom && playerBottom?.name))
+                  : "Select a player to vote for!"}
+              </Alert>
+            </Stack>
+          </CardContent>
+        </Card>
+        <Card sx={{ textAlign: "start", display: "block" }}>
+          <CardHeader
+            title="View Battle Bracket"
+            titleTypographyProps={{ variant: "h6" }}
+            subheader="Drag to check the current standings in the bracket."
+            subheaderTypographyProps={{ variant: "body2" }}
+          />
+          <CardMedia
+            component="iframe"
+            src="https://challonge.com/18qssxzv/module"
+            style={{ border: 0, minHeight: "400px" }}
+            title="Bracket"
+          />
+        </Card>
+      </Stack>
+
+      <FooterBar />
     </>
   )
 }
 
 function voteOrUnvote(voted: boolean | undefined) {
-  return voted ? "unvote" : "vote"
+  return voted ? "Undo vote" : "Vote"
 }
 
 export default Vote
