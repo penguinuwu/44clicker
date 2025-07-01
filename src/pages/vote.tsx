@@ -38,9 +38,7 @@ function Vote() {
   // generate voterId
   const [voterId, setVoterId] = useState<string>()
   useEffect(() => {
-    db.getLocalId("guest")
-      .then((v) => setVoterId(v))
-      .catch((e) => console.debug(e))
+    db.getLocalId("guest").then((v) => setVoterId(v))
   }, [])
   console.debug(`id: ${voterId}`)
 

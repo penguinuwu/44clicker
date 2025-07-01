@@ -176,7 +176,7 @@ function renderPlayerPositionReset(players: PlayerJson[]) {
 }
 
 function updatePosition(id: string, pos: "top" | "bottom" | null) {
-  console.debug(db.transact(db.tx.players[id].update({ position: pos })))
+  db.transact(db.tx.players[id].update({ position: pos }))
 }
 
 export default Manage
