@@ -1,5 +1,4 @@
 export type ScoreJson = {
-  id: string
   hash: string
   videoId: string
   judgeName: string
