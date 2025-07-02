@@ -9,12 +9,18 @@ const db = init({
   appId: atob(`${import.meta.env.VITE_DB}`),
 })
 
+let bingus = localStorage.getItem("bingus")
+
 function Manage() {
   // add new player name
   const [newName, setNewName] = useState<string | null>(null)
 
   // subscribe for player/vote changes
-  const { isLoading, error, data } = db.useQuery({ players: {}, votes: {} })
+  const { isLoading, error, data } = db.useQuery({
+    players: {},
+    votes: {},
+    bingus: {},
+  })
 
   if (error) {
     console.debug(error)
@@ -22,6 +28,16 @@ function Manage() {
   }
   if (isLoading) {
     return <p className="italic text-gray-700">Loading...</p>
+  }
+
+  const checkBingus = (bgs: string | null) =>
+    data?.bingus?.some((b) => b?.str === bgs)
+  if (bingus === null || !checkBingus(bingus)) {
+    bingus = prompt("yo yo")
+    if (!checkBingus(bingus)) {
+      return <p className="italic text-gray-700">Please reload the page...</p>
+    }
+    localStorage.setItem("bingus", `${bingus}`)
   }
 
   const players = data.players as PlayerJson[]
