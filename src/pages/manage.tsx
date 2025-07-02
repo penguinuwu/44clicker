@@ -57,12 +57,19 @@ function Manage() {
       <p>
         1. {renderRecordVotes(playerTop, totalTop, playerBottom, totalBottom)}
       </p>
-      <p>2. {renderPlayerPositionReset(players)}</p>
-      <p>3. {renderClearVotes(votes)}</p>
+      <p>
+        2. <br /> {renderPlayerPositionReset(players)}
+      </p>
+      <p>
+        3. <br /> {renderClearVotes(votes)}
+      </p>
 
+      <hr />
+      <p>Players:</p>
       {renderPlayers(players, playerTop, playerBottom)}
 
       <div>
+        <p>Add player name:</p>
         <TextareaAutosize
           onChange={(e) => setNewName(e.target.value)}
           value={newName ?? ""}
@@ -99,7 +106,7 @@ function renderClearVotes(votes: VoteJson[]) {
         })
       }}
     >
-      clear votes
+      delete votes
     </Button>
   )
 }
@@ -132,7 +139,7 @@ function renderRecordVotes(
           }
         }}
       >
-        record votes
+        confirm votes
       </Button>
     </>
   )
@@ -146,7 +153,7 @@ function renderPlayers(
   return (
     <ul>
       {players.map((player) => (
-        <li key={player.id}>
+        <li key={player.id} style={{ marginBottom: "1em" }}>
           {player.name} - votes:{player.votes} - {player.position}
           <br />
           <Button
@@ -186,7 +193,7 @@ function renderPlayerPositionReset(players: PlayerJson[]) {
         players.forEach((player) => updatePosition(player.id, null))
       }}
     >
-      reset players
+      unselect players
     </Button>
   )
 }
