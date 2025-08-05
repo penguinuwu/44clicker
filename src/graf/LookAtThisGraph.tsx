@@ -194,6 +194,12 @@ function LookAtThisGraph({
                   )
                 }
                 disabled={appMode === AppMode.Playback}
+                sx={{
+                  // button disappears when disabled and in dark theme
+                  // because tooltip background colour is always white
+                  // but the button colour is dynamic
+                  "&.Mui-disabled": { color: "#c6c6c6" },
+                }}
               >
                 Delete
               </Button>
