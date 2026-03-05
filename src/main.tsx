@@ -2,6 +2,7 @@ import { createTheme, ThemeProvider } from "@mui/material"
 import CssBaseline from "@mui/material/CssBaseline"
 import { StrictMode } from "react"
 import { createRoot } from "react-dom/client"
+import { BrowserRouter, Navigate, Route, Routes } from "react-router"
 
 import App from "$/components/App"
 import "$/index.css"
@@ -53,7 +54,7 @@ const theme = createTheme({
     MuiTooltip: {
       defaultProps: {
         arrow: true,
-      }
+      },
     },
     MuiFormControl: {
       defaultProps: {
@@ -125,7 +126,12 @@ createRoot(document.getElementById("root")!).render(
     <ThemeProvider theme={theme}>
       {/* https://github.com/mui/material-ui/issues/30146#issuecomment-991188096 */}
       <CssBaseline />
-      <App />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<App />} />
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </BrowserRouter>
     </ThemeProvider>
   </StrictMode>,
 )

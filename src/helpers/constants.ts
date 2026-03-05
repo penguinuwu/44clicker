@@ -23,7 +23,7 @@ export enum DefaultKeys {
   KeyNegative = "f",
   KeyPositive = "j",
 }
-export const DEFAULT_VIDEO_ID = "qYWOwzpSBd0"
+export const DEFAULT_VIDEO_ID = "It1ZUhLSDMY"
 
 export const DEFAULT_JUDGE_NAME = ""
 export const JUDGE_NAME_LIMIT = 30
