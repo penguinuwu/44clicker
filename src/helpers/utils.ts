@@ -1,6 +1,6 @@
 import Hashids from "hashids"
 
-import { AppMode, JUDGE_NAME_LIMIT } from "$/helpers/constants"
+import { AppMode, JUDGE_NAME_LIMIT, ROOT_ELEMENT_ID } from "$/helpers/constants"
 import { ScoreJson } from "$/helpers/types"
 
 /**
@@ -10,7 +10,7 @@ import { ScoreJson } from "$/helpers/types"
  */
 export function regainClickerFocus(appMode: AppMode) {
   if (appMode === AppMode.Scoring) {
-    window.document.getElementById("root")?.focus({
+    window.document.getElementById(ROOT_ELEMENT_ID)?.focus({
       preventScroll: true,
       // @ts-ignore: firefox implemented this
       focusVisible: false,

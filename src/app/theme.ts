@@ -1,11 +1,6 @@
-import { createTheme, ThemeProvider } from "@mui/material"
-import CssBaseline from "@mui/material/CssBaseline"
-import { StrictMode } from "react"
-import { createRoot } from "react-dom/client"
-import { BrowserRouter, Navigate, Route, Routes } from "react-router"
+"use client"
 
-import App from "$/components/App"
-import "$/index.css"
+import { createTheme } from "@mui/material/styles"
 
 const paletteLight = {
   main: "#fff",
@@ -67,8 +62,10 @@ const theme = createTheme({
         color: "secondary",
         margin: "dense",
         size: "small",
-        InputLabelProps: {
-          shrink: true,
+        slotProps: {
+          inputLabel: {
+            shrink: true,
+          },
         },
       },
     },
@@ -102,36 +99,27 @@ const theme = createTheme({
         },
       },
     },
-    MuiGrid2: {
+    MuiGrid: {
       defaultProps: {
         container: true,
         spacing: { xs: 1, sm: 2, md: 3 },
-        alignItems: "stretch",
-        justifyContent: "space-evenly",
-        flexGrow: 1,
+        sx: {
+          alignItems: "stretch",
+          justifyContent: "space-evenly",
+          flexGrow: 1,
+        },
       },
     },
     MuiStack: {
       defaultProps: {
         spacing: { xs: 1, sm: 2, md: 3 },
-        alignItems: "stretch",
-        justifyContent: "center",
+        sx: {
+          alignItems: "stretch",
+          justifyContent: "center",
+        },
       },
     },
   },
 })
 
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <ThemeProvider theme={theme}>
-      {/* https://github.com/mui/material-ui/issues/30146#issuecomment-991188096 */}
-      <CssBaseline />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<App />} />
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-      </BrowserRouter>
-    </ThemeProvider>
-  </StrictMode>,
-)
+export default theme

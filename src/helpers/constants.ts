@@ -28,6 +28,8 @@ export const DEFAULT_VIDEO_ID = "It1ZUhLSDMY"
 export const DEFAULT_JUDGE_NAME = ""
 export const JUDGE_NAME_LIMIT = 30
 
+export const ROOT_ELEMENT_ID = "root"
+
 // interval delay in milliseconds
 // humans can perceive every ~10ms
 // so for clicker playback, we run an interval every 10ms

@@ -1,6 +1,6 @@
 # 44Clicker
 
-A React web application for scoring yo-yo freestyles with real-time visualization and cloud storage.
+Judge and share yo-yo performances with graph visualization and clicks playback!
 
 ## Features
 
@@ -17,9 +17,8 @@ A React web application for scoring yo-yo freestyles with real-time visualizatio
 
 ## Tools Used
 
-- [React v18](https://react.dev/)
+- [Next.js](https://nextjs.org/)
 - [InstantDB](https://instantdb.com/)
-- [Vite](https://vite.dev/)
 - [Highcharts](https://highcharts.com/)
 - [ReactPlayer](https://github.com/cookpete/react-player/)
 - [Material UI](https://mui.com/)
@@ -30,6 +29,8 @@ A React web application for scoring yo-yo freestyles with real-time visualizatio
 ```plaintext
 44clicker/
 ├── src/
+│   ├── app/                    # Next.js App Router
+│   │
 │   ├── components/             # React components
 │   │   ├── App.tsx               # Main application component
 │   │   ├── HeaderBar.tsx         # Navigation and main actions
@@ -41,14 +42,14 @@ A React web application for scoring yo-yo freestyles with real-time visualizatio
 │   │   └── MyToolTip.tsx         # Chart hover tooltip
 │   │
 │   ├── handlers/               # Main functionality handlers
-│   │   ├── replayHandler.tsx     # Score replay logic
-│   │   ├── scoringHandler.tsx    # Scoring logic
-│   │   └── userInputHandler.tsx  # User input parsing logic
+│   │   ├── replayHandler.ts      # Score replay logic
+│   │   ├── scoringHandler.ts     # Scoring logic
+│   │   └── userInputHandler.ts   # User input parsing logic
 │   │
-│   ├── assets/                 # Static assets
+│   ├── assets/                 # Cached static assets
 │   └── helpers/                # Utility functions
-│   
-├── main.tsx                    # App entry point
+│
+├── public/                     # Public static assets
 └── .env.local                  # Environment variables
 ```
 
@@ -81,7 +82,7 @@ pnpm build
 Required in `.env.local`:
 
 ```sh
-VITE_DB=<InstantDB App ID>
+NEXT_PUBLIC_VITE_DB=<InstantDB App ID>
 ```
 
 ---

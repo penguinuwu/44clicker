@@ -18,8 +18,8 @@ interface Props {
   judgeName: string
   videoId: string
   scoreMap: Map<number, number>
-  fileUploadElement: React.MutableRefObject<HTMLInputElement | null>
-  filesDownloadElement: React.MutableRefObject<HTMLAnchorElement | null>
+  fileUploadElement: React.RefObject<HTMLInputElement | null>
+  filesDownloadElement: React.RefObject<HTMLAnchorElement | null>
 }
 
 function FooterBar({
@@ -33,47 +33,48 @@ function FooterBar({
   return (
     <Paper elevation={4} sx={{ borderRadius: 0 }}>
       <Stack
-        paddingTop={5}
-        paddingBottom={1}
-        paddingX={1}
         spacing={0.5}
         direction="row"
-        justifyContent="center"
-        alignItems="center"
-        sx={{ flexWrap: "wrap" }}
+        sx={{
+          flexWrap: "wrap",
+          paddingTop: 5,
+          paddingBottom: 1,
+          paddingX: 1,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
       >
         <Typography>Any issues? Let us know on</Typography>
         <Link
-          display="flex"
-          alignItems="center"
           href="https://github.com/penguinuwu/44clicker"
+          sx={{ display: "flex", alignItems: "center" }}
         >
           <GitHubIcon fontSize="inherit" sx={{ marginRight: 0.3 }} />
           Github!
         </Link>
       </Stack>
       <Stack
-        padding={1}
         spacing={0.5}
         direction="row"
-        justifyContent="center"
-        alignItems="center"
-        sx={{ flexWrap: "wrap" }}
+        sx={{
+          flexWrap: "wrap",
+          padding: 1,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
       >
         <Typography>Made by</Typography>
         <Link
-          display="flex"
-          alignItems="center"
           href="https://www.instagram.com/walk_the_chiken/"
+          sx={{ display: "flex", alignItems: "center" }}
         >
           <InstagramIcon fontSize="inherit" sx={{ marginRight: 0.3 }} />
           Evan Cui
         </Link>
         <Typography>and</Typography>
         <Link
-          display="flex"
-          alignItems="center"
           href="https://www.instagram.com/0_tacgibrm/"
+          sx={{ display: "flex", alignItems: "center" }}
         >
           <InstagramIcon fontSize="inherit" sx={{ marginRight: 0.3 }} />
           Yibo Xu
@@ -81,14 +82,16 @@ function FooterBar({
         <Typography>:]</Typography>
       </Stack>
       <Stack
-        paddingTop={1}
-        paddingBottom={5}
-        paddingX={1}
         spacing={1}
         direction="row"
-        justifyContent="center"
-        alignItems="center"
-        sx={{ flexWrap: "wrap" }}
+        sx={{
+          flexWrap: "wrap",
+          paddingTop: 1,
+          paddingBottom: 5,
+          paddingX: 1,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
       >
         <Tooltip title="Import scores via JSON file">
           <span>

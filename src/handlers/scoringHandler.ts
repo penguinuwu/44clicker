@@ -47,7 +47,7 @@ export function generateClickListener(
   appMode: AppMode,
   videoReady: boolean,
   videoDuration: number,
-  youtubePlayer: React.MutableRefObject<YouTubePlayer | null>,
+  youtubePlayer: React.RefObject<YouTubePlayer | null>,
   keyPositive: string,
   keyNegative: string,
   setScoreMap: React.Dispatch<React.SetStateAction<Map<number, number>>>,
@@ -111,7 +111,7 @@ export function addClick(
   appMode: AppMode,
   videoReady: boolean,
   videoDuration: number,
-  youtubePlayer: React.MutableRefObject<YouTubePlayer | null>,
+  youtubePlayer: React.RefObject<YouTubePlayer | null>,
   setScoreMap: React.Dispatch<React.SetStateAction<Map<number, number>>>,
   clickScore: number,
 ) {

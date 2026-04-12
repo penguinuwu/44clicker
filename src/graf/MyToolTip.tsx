@@ -1,3 +1,5 @@
+"use client"
+
 import { Chart, TooltipFormatterContextObject } from "highcharts"
 import { useEffect, useRef, useState } from "react"
 import ReactDOM from "react-dom"
@@ -9,8 +11,8 @@ function generateTooltipId(chartId: number) {
 
 interface Props {
   chart: Chart | null
-  youtubePlayer: React.MutableRefObject<YouTubePlayer | null>
-  children(formatterContext: TooltipFormatterContextObject): JSX.Element
+  youtubePlayer: React.RefObject<YouTubePlayer | null>
+  children(formatterContext: TooltipFormatterContextObject): React.ReactElement
 }
 
 /**

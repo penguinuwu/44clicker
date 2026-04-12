@@ -19,7 +19,6 @@ import Typography from "@mui/material/Typography"
 import useScrollTrigger from "@mui/material/useScrollTrigger"
 import { useState } from "react"
 
-import LogoSvg from "$/assets/logo.svg"
 import PublishScoresDialog from "$/components/PublishDialog"
 import { changeVideo, publishScores } from "$/handlers/userInputHandler"
 import { AppMode } from "$/helpers/constants"
@@ -81,14 +80,14 @@ function HeaderBar({
           regainClickerFocus(appMode)
         }
       }}
-      sx={{ width: "100%" }}
+      sx={{ width: { xs: "100%", md: "80%", xl: "60%" } }}
       required
       slotProps={{
         input: {
-          startAdornment: (
-            <InputAdornment position="start">
+          endAdornment: (
+            <InputAdornment position="end">
               <IconButton
-                edge="start"
+                edge="end"
                 onClick={() => {
                   changeVideo(
                     videoUrl,
@@ -165,9 +164,12 @@ function HeaderBar({
         <AppBar position="fixed">
           <Toolbar sx={{ justifyContent: "space-between" }}>
             {/* logos */}
-            <Stack spacing={2} alignItems="center" direction="row">
+            <Stack spacing={2} direction="row" sx={{ alignItems: "center" }}>
               <Icon component="a" href="#" sx={{ height: "2em", width: "2em" }}>
-                <img src={LogoSvg} style={{ height: "100%", width: "100%" }} />
+                <img
+                  src={`${process.env.NEXT_PUBLIC_BASE_PATH}/logo.svg`}
+                  style={{ height: "100%", width: "100%" }}
+                />
               </Icon>
               <Badge
                 badgeContent="Beta"
@@ -195,9 +197,11 @@ function HeaderBar({
 
             {/* search bar */}
             <Box
-              marginLeft="5%"
-              marginRight={{ xs: "1%", sm: "3%", md: "5%" }}
-              flexGrow={1}
+              sx={{
+                marginX: "5%",
+                flexGrow: 1,
+                textAlign: "center",
+              }}
             >
               {searchBarVideoId}
             </Box>
@@ -205,9 +209,11 @@ function HeaderBar({
             {/* button menu */}
             <Stack
               spacing={1}
-              alignItems="stretch"
               direction="row"
-              display={{ xs: "none", md: "inline-flex" }}
+              sx={{
+                alignItems: "stretch",
+                display: { xs: "none", md: "inline-flex" },
+              }}
             >
               {buttonPublishScores}
             </Stack>

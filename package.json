@@ -1,39 +1,35 @@
 {
   "name": "44clicker",
+  "version": "0.0.1",
   "private": true,
-  "version": "0.0.0",
-  "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
   },
   "dependencies": {
-    "@emotion/react": "^11.14.0",
+    "@emotion/cache": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@instantdb/react": "^0.14.30",
-    "@mui/icons-material": "^6.5.0",
-    "@mui/material": "^6.5.0",
+    "@mui/icons-material": "^9.0.0",
+    "@mui/material": "^9.0.0",
+    "@mui/material-nextjs": "^9.0.0",
     "hashids": "^2.3.0",
     "highcharts": "^11.4.8",
     "highcharts-react-official": "^3.2.3",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-player": "^2.16.1",
-    "react-router": "^7.13.1"
+    "next": "16.2.3",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "react-player": "^2.16.1"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.3",
-    "@types/react": "^18.3.28",
-    "@types/react-dom": "^18.3.7",
-    "@vitejs/plugin-react-swc": "^3.11.0",
-    "eslint": "^9.39.3",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.26",
-    "globals": "^15.15.0",
-    "typescript": "~5.6.3",
-    "typescript-eslint": "^8.56.1",
-    "vite": "^5.4.21"
+    "@types/node": "latest",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "babel-plugin-react-compiler": "1.0.0",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.3",
+    "typescript": "^5"
   }
 }
