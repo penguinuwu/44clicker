@@ -273,7 +273,8 @@ export async function publishScores(
   const scoreJson = await getScoreJson(videoId, judgeName, scoreMap)
 
   const url =
-    `${window.location.origin}/?` + `id=${encodeURIComponent(scoreJson.hash)}`
+    `${window.location.origin}${window.location.pathname}?` +
+    `id=${encodeURIComponent(scoreJson.hash)}`
 
   // publish scores
   db.transact(tx.scores[id()].update(scoreJson))
