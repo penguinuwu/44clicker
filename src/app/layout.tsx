@@ -31,11 +31,11 @@ export const metadata: Metadata = {
     title: "44Clicker",
     description:
       "Judge and share yo-yo performances with graph visualization and clicks playback!",
-    url: "https://44clicker.com",
+    url: `${process.env.NEXT_PUBLIC_HOST}`,
     siteName: "44Clicker",
     images: [
       {
-        url: `https://${process.env.NEXT_PUBLIC_HOST}${process.env.NEXT_PUBLIC_BASE_PATH}/44clicker-text-icon.png`,
+        url: `${process.env.NEXT_PUBLIC_HOST}/44clicker-text-icon.png`,
         width: 1200,
         height: 630,
         alt: "44Clicker logo",
@@ -49,9 +49,7 @@ export const metadata: Metadata = {
     title: "44Clicker",
     description:
       "Judge and share yo-yo performances with graph visualization and clicks playback!",
-    images: [
-      `https://${process.env.NEXT_PUBLIC_HOST}${process.env.NEXT_PUBLIC_BASE_PATH}/44clicker-text-icon.png`,
-    ],
+    images: [`${process.env.NEXT_PUBLIC_HOST}/44clicker-text-icon.png`],
   },
 }
 

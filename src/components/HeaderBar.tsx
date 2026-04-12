@@ -167,7 +167,7 @@ function HeaderBar({
             <Stack spacing={2} direction="row" sx={{ alignItems: "center" }}>
               <Icon component="a" href="#" sx={{ height: "2em", width: "2em" }}>
                 <img
-                  src={`${process.env.NEXT_PUBLIC_BASE_PATH}/logo.svg`}
+                  src={`${process.env.NEXT_PUBLIC_HOST}/logo.svg`}
                   style={{ height: "100%", width: "100%" }}
                 />
               </Icon>

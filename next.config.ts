@@ -6,12 +6,20 @@ const nextConfig: NextConfig = {
 
   output: "export",
 
-  // set base path and asset prefix for deployment
-  basePath: process.env.PAGES_BASE_PATH,
+  // remove
+  // https://nextjs.org/docs/architecture/nextjs-compiler#remove-console
+  compiler: {
+    removeConsole: process.env.NODE_ENV === "production" && { 
+      exclude: ["error", "warn"]
+    }
+  },
+
+  // set base path for deployment
   env: {
     NEXT_PUBLIC_HOST:
-      process.env.PAGES_HOST || process.env.CF_PAGES_URL || "44clicker.com",
-    NEXT_PUBLIC_BASE_PATH: process.env.PAGES_BASE_PATH || "",
+      process.env.CF_PAGES_URL ||
+      process.env.NEXT_PUBLIC_HOST ||
+      "https://44clicker.com",
   },
 }
 

@@ -47,6 +47,7 @@ import {
   regainClickerFocus,
   youtubeVideoIdToUrl,
 } from "$/helpers/utils"
+import { useSearchParams } from "next/navigation"
 
 // init scores database
 const db = init<ScoreJson>({
@@ -56,6 +57,9 @@ const db = init<ScoreJson>({
 function App() {
   // web app mode
   const [appMode, setAppMode] = useState(AppMode.Scoring)
+
+  // url search params for video replay
+  const searchParams = useSearchParams()
 
   // video information
   const youtubePlayer = useRef<YouTubePlayer | null>(null)
@@ -143,17 +147,14 @@ function App() {
 
   // parse url query parameters for video replay
   useEffect(() => {
-    const url = new URL(window.location.href)
-    const params = new URLSearchParams(url.searchParams)
-
     // get recording id
-    const scoreHash = params.get("id")
+    const scoreHash = searchParams.get("id")
 
     if (scoreHash !== null) {
       console.debug(scoreHash)
 
       // reset url
-      window.history.pushState(null, "", "/")
+      window.history.pushState(null, "", window.location.pathname)
 
       db.queryOnce({ scores: { $: { where: { hash: scoreHash } } } })
         .then(async ({ data }) => {
