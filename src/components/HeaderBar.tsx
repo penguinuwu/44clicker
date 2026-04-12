@@ -168,6 +168,7 @@ function HeaderBar({
               <Icon component="a" href="#" sx={{ height: "2em", width: "2em" }}>
                 <img
                   src={`${process.env.NEXT_PUBLIC_HOST}/logo.svg`}
+                  alt="44Clicker"
                   style={{ height: "100%", width: "100%" }}
                 />
               </Icon>
