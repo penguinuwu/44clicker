@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
   // https://nextjs.org/docs/architecture/nextjs-compiler#remove-console
   compiler: {
     removeConsole: process.env.NODE_ENV === "production" && { 
-      exclude: ["error", "warn"]
+      exclude: ["error"]
     }
   },
 
