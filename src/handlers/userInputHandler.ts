@@ -83,7 +83,7 @@ export function changeVideo(
  * @returns void
  */
 export async function downloadScores(
-  filesDownloadElement: React.MutableRefObject<HTMLAnchorElement | null>,
+  filesDownloadElement: React.RefObject<HTMLAnchorElement | null>,
   videoId: string,
   judgeName: string,
   scoreMap: Map<number, number>,
@@ -131,7 +131,7 @@ export async function importScoreJson(
   setVideoUrl: React.Dispatch<React.SetStateAction<string>>,
   setVideoReady: React.Dispatch<React.SetStateAction<boolean>>,
   setVideoId: React.Dispatch<React.SetStateAction<string>>,
-  setJudgeName: React.Dispatch<React.SetStateAction<string>>,
+  setJudgeName: React.Dispatch<React.SetStateAction<string | null>>,
   scoreJson: ScoreJson,
   confirm: boolean,
 ) {
@@ -201,13 +201,13 @@ export async function importScoreJson(
  * @returns void
  */
 export async function importScoresFromFile(
-  fileUploadElement: React.MutableRefObject<HTMLInputElement | null>,
+  fileUploadElement: React.RefObject<HTMLInputElement | null>,
   currentVideoId: string,
   setScoreMap: React.Dispatch<React.SetStateAction<Map<number, number>>>,
   setVideoUrl: React.Dispatch<React.SetStateAction<string>>,
   setVideoReady: React.Dispatch<React.SetStateAction<boolean>>,
   setVideoId: React.Dispatch<React.SetStateAction<string>>,
-  setJudgeName: React.Dispatch<React.SetStateAction<string>>,
+  setJudgeName: React.Dispatch<React.SetStateAction<string | null>>,
 ) {
   const scoreFiles = fileUploadElement.current?.files
   if (!scoreFiles?.length || scoreFiles.length <= 0) {
@@ -273,7 +273,8 @@ export async function publishScores(
   const scoreJson = await getScoreJson(videoId, judgeName, scoreMap)
 
   const url =
-    `${window.location.origin}/?` + `id=${encodeURIComponent(scoreJson.hash)}`
+    `${window.location.origin}${window.location.pathname}?` +
+    `id=${encodeURIComponent(scoreJson.hash)}`
 
   // publish scores
   db.transact(tx.scores[id()].update(scoreJson))

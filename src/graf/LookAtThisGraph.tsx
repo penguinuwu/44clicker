@@ -16,7 +16,7 @@ import { formatTimestamp } from "$/helpers/utils"
 
 interface Props {
   appMode: AppMode
-  youtubePlayer: React.MutableRefObject<YouTubePlayer | null>
+  youtubePlayer: React.RefObject<YouTubePlayer | null>
   videoDuration: number
   displayScoreMapArray: [number, number][]
   scoreMapArray: [number, number][]
@@ -126,8 +126,7 @@ function LookAtThisGraph({
                 // https://stackoverflow.com/a/47095386
                 (
                   (sum) =>
-                  ([t, c]) =>
-                    [t * 1000, (sum += c)]
+                  ([t, c]) => [t * 1000, (sum += c)]
                 )(0),
               ),
             },
@@ -151,7 +150,7 @@ function LookAtThisGraph({
             <Stack
               spacing={1}
               direction="row"
-              alignItems="center"
+              sx={{ alignItems: "center" }}
               onTouchStartCapture={(e) => {
                 // prevent mobile button clicks from activating other tooltips
                 e.stopPropagation()

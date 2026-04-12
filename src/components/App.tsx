@@ -1,13 +1,15 @@
+"use client"
+
 import { init } from "@instantdb/react"
 import DeleteIcon from "@mui/icons-material/Delete"
 import PauseCircleOutlinedIcon from "@mui/icons-material/PauseCircleOutlined"
-import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline"
+import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutlined"
 import SyncAltIcon from "@mui/icons-material/SyncAlt"
 import Button from "@mui/material/Button"
 import Card from "@mui/material/Card"
 import CardContent from "@mui/material/CardContent"
 import CardMedia from "@mui/material/CardMedia"
-import Grid2 from "@mui/material/Grid2"
+import Grid from "@mui/material/Grid"
 import Stack from "@mui/material/Stack"
 import TextField from "@mui/material/TextField"
 import Tooltip from "@mui/material/Tooltip"
@@ -48,24 +50,8 @@ import {
 
 // init scores database
 const db = init<ScoreJson>({
-  appId: atob(`${import.meta.env.VITE_DB}`),
+  appId: atob(`${process.env.NEXT_PUBLIC_VITE_DB}`),
 })
-
-// get keys from localstorage
-let initialKeyPositive =
-  localStorage.getItem(StorageKey.KeyPositive) || DefaultKeys.KeyPositive
-let initialKeyNegative =
-  localStorage.getItem(StorageKey.KeyNegative) || DefaultKeys.KeyNegative
-if (!isValidKeys(initialKeyPositive, initialKeyNegative)) {
-  initialKeyPositive = DefaultKeys.KeyPositive
-  initialKeyNegative = DefaultKeys.KeyNegative
-  localStorage.setItem(StorageKey.KeyPositive, DefaultKeys.KeyPositive)
-  localStorage.setItem(StorageKey.KeyNegative, DefaultKeys.KeyNegative)
-}
-
-// get whether the keys are flipped
-let initialIsKeysFlipped =
-  localStorage.getItem(StorageKey.IsKeysFlipped) === "true"
 
 function App() {
   // web app mode
@@ -121,29 +107,51 @@ function App() {
   const fileUploadElement = useRef<HTMLInputElement | null>(null)
 
   // user input fields
-  const [keyPositive, setKeyPositive] = useState(initialKeyPositive)
-  const [keyNegative, setKeyNegative] = useState<string>(initialKeyNegative)
-  const [isKeysFlipped, setIsKeysFlipped] =
-    useState<boolean>(initialIsKeysFlipped)
-  const [judgeName, setJudgeName] = useState<string>(() => {
+  const [keyPositive, setKeyPositive] = useState<string | null>(null)
+  const [keyNegative, setKeyNegative] = useState<string | null>(null)
+  const [isKeysFlipped, setIsKeysFlipped] = useState<boolean | null>(null)
+  const [judgeName, setJudgeName] = useState<string | null>(null)
+
+  // load keys from localstorage on initial render
+  // https://stackoverflow.com/a/76301770
+  // https://sentry.io/answers/referenceerror-localstorage-is-not-defined-in-next-js/
+  useEffect(() => {
+    // get keys from localstorage
+    let initialKeyPositive =
+      localStorage.getItem(StorageKey.KeyPositive) || DefaultKeys.KeyPositive
+    let initialKeyNegative =
+      localStorage.getItem(StorageKey.KeyNegative) || DefaultKeys.KeyNegative
+    if (!isValidKeys(initialKeyPositive, initialKeyNegative)) {
+      initialKeyPositive = DefaultKeys.KeyPositive
+      initialKeyNegative = DefaultKeys.KeyNegative
+      localStorage.setItem(StorageKey.KeyPositive, DefaultKeys.KeyPositive)
+      localStorage.setItem(StorageKey.KeyNegative, DefaultKeys.KeyNegative)
+    }
+    setKeyPositive(initialKeyPositive)
+    setKeyNegative(initialKeyNegative)
+
+    // get whether the keys are flipped
+    let initialIsKeysFlipped =
+      localStorage.getItem(StorageKey.IsKeysFlipped) === "true"
+    setIsKeysFlipped(initialIsKeysFlipped)
+
+    // get judge name
     const initialJudgeName =
       localStorage.getItem(StorageKey.JudgeName) || DEFAULT_JUDGE_NAME
-    return `${initialJudgeName}`.substring(0, JUDGE_NAME_LIMIT)
-  })
+    setJudgeName(`${initialJudgeName}`.substring(0, JUDGE_NAME_LIMIT))
+  }, [])
 
   // parse url query parameters for video replay
   useEffect(() => {
-    const url = new URL(window.location.href)
-    const params = new URLSearchParams(url.searchParams)
-
     // get recording id
-    const scoreHash = params.get("id")
+    const urlParams = new URLSearchParams(window.location.search)
+    const scoreHash = urlParams?.get("id")
 
     if (scoreHash !== null) {
       console.debug(scoreHash)
 
       // reset url
-      window.history.pushState(null, "", "/")
+      window.history.pushState(null, "", window.location.pathname)
 
       db.queryOnce({ scores: { $: { where: { hash: scoreHash } } } })
         .then(async ({ data }) => {
@@ -178,7 +186,11 @@ function App() {
 
   // add clicking key event listener
   useEffect(() => {
-    if (appMode !== AppMode.Scoring) {
+    if (
+      appMode !== AppMode.Scoring ||
+      keyPositive === null ||
+      keyNegative === null
+    ) {
       return
     }
 
@@ -260,6 +272,16 @@ function App() {
     keyNegative,
   ])
 
+  // do not render until keys are loaded from localstorage
+  if (
+    keyPositive === null ||
+    keyNegative === null ||
+    isKeysFlipped === null ||
+    judgeName === null
+  ) {
+    return null
+  }
+
   return (
     <>
       {/* header */}
@@ -281,13 +303,15 @@ function App() {
       />
       {/* content */}
       <Stack
-        marginX={{ xs: 2, md: 3, lg: "10%", xl: "18%" }}
-        marginY={{ xs: 2, md: 3 }}
+        sx={{
+          marginX: { xs: 2, md: 3, lg: "10%", xl: "18%" },
+          marginY: { xs: 2, md: 3 },
+        }}
       >
         {/* input buttons */}
-        <Grid2>
+        <Grid>
           {/* key bindings */}
-          <Grid2 size={{ xs: 12, sm: 8 }}>
+          <Grid size={{ xs: 12, sm: 8 }}>
             <Card>
               <CardContent sx={{ flexGrow: 1 }}>
                 <Stack
@@ -357,10 +381,10 @@ function App() {
                 </Stack>
               </CardContent>
             </Card>
-          </Grid2>
+          </Grid>
 
           {/* reset / playback */}
-          <Grid2 size={{ xs: 12, sm: 4 }}>
+          <Grid size={{ xs: 12, sm: 4 }}>
             <Card>
               <CardContent>
                 <Stack
@@ -450,8 +474,8 @@ function App() {
                 </Stack>
               </CardContent>
             </Card>
-          </Grid2>
-        </Grid2>
+          </Grid>
+        </Grid>
 
         {/* video */}
         <Card
@@ -476,7 +500,7 @@ function App() {
             },
           ]}
         >
-          <Stack spacing={0} direction="column" flexGrow={1}>
+          <Stack spacing={0} direction="column" sx={{ flexGrow: 1 }}>
             <Stack
               spacing={0}
               direction={isKeysFlipped ? "row-reverse" : "row"}
@@ -553,8 +577,11 @@ function App() {
             <Stack
               spacing={0}
               direction={isKeysFlipped ? "row-reverse" : "row"}
-              display={{ md: "none" }}
-              sx={{ borderTopRightRadius: 0, borderTopLeftRadius: 0 }}
+              sx={{
+                borderTopRightRadius: 0,
+                borderTopLeftRadius: 0,
+                display: { md: "none" },
+              }}
             >
               <Button
                 variant="contained"
