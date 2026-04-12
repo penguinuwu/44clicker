@@ -50,7 +50,7 @@ function FooterBar({
           sx={{ display: "flex", alignItems: "center" }}
         >
           <GitHubIcon fontSize="inherit" sx={{ marginRight: 0.3 }} />
-          Github!
+          GitHub!
         </Link>
       </Stack>
       <Stack
