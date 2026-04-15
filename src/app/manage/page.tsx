@@ -3,7 +3,7 @@
 import { id, init } from "@instantdb/react"
 import Button from "@mui/material/Button"
 import TextareaAutosize from "@mui/material/TextareaAutosize"
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 
 import { PlayerJson, VoteJson } from "$/helpers/types"
 
@@ -43,7 +43,7 @@ function Manage() {
     if (!checkBingus(b)) {
       return <p className="italic text-gray-700">Please reload the page...</p>
     }
-    setBingus(b)
+    setBingus(`${b}`)
     localStorage.setItem("bingus", `${b}`)
   }
 
